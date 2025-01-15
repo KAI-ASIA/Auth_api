@@ -67,9 +67,7 @@ public class TakeSessionService extends BaseService {
 
         // Lấy thông tin session từ DB
         AuthSessionResponse authSessionResponse = sessionIdDAO.getAuthSessionId(enquiry.getSessionId());
-//        String LOCATION = apiRequest.getHeader().getChannel() + "-" +
-//                (authSessionResponse != null ? authSessionResponse.getUsername() : "Unknown") +
-//                "-" + enquiry.getLoginTime();
+
         String LOCATION = enquiry.getSessionId();
         // Kiểm tra session có tồn tại không
         if (authSessionResponse == null) {
