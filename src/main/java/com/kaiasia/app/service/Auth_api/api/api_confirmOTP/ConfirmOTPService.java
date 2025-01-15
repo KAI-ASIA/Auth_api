@@ -71,7 +71,7 @@ public class ConfirmOTPService {
 
         OTP otp = new OTP();
         try {
-            otp = authOTPService.getOTP(enquiry);
+            otp = authOTPService.getOTP(enquiry.get("sessionId").toString(), enquiry.get(("username")).toString(), enquiry.get("transId").toString());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -87,7 +87,7 @@ public class ConfirmOTPService {
                 ApiError apiError = apiErrorUtils.getError("601", new String[]{""});
                 return takeRespose(auth3Response, apiError);
             }
-
+            log.info("Start Time: {}",otp.getStart_time());
             //Check time out cua ma OTP
             if (checkTimeOut(otp.getEnd_time())) {
                 ApiError apiError = apiErrorUtils.getError("998", new String[]{"OTP expired!"});
@@ -100,6 +100,8 @@ public class ConfirmOTPService {
                 authOTPService.setConfirmTime(now, otp);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
+                ApiError apiError = apiErrorUtils.getError("505", new String[]{""});
+                return takeRespose(auth3Response, apiError);
             }
             return takeRespose(auth3Response);
         }

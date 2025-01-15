@@ -1,5 +1,6 @@
 package com.kaiasia.app.service.Auth_api.api.api_getOTP;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 import com.kaiasia.app.core.utils.ApiConstant;
@@ -9,6 +10,10 @@ import com.kaiasia.app.register.KaiService;
 import com.kaiasia.app.register.Register;
 import com.kaiasia.app.service.Auth_api.dao.IAuthOTPDao;
 import com.kaiasia.app.service.Auth_api.dto.GetOTPResponse;
+import com.kaiasia.app.service.Auth_api.kafka.resetpwd.KafkaUtils;
+import com.kaiasia.app.service.Auth_api.model.Auth2InsertDb;
+import com.kaiasia.app.service.Auth_api.model.Auth2Request;
+import com.kaiasia.app.service.Auth_api.utils.ResetPwdUtils;
 import lombok.extern.slf4j.Slf4j;
 import ms.apiclient.model.ApiBody;
 import ms.apiclient.model.ApiError;
@@ -16,9 +21,10 @@ import ms.apiclient.model.ApiRequest;
 import ms.apiclient.model.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 
-import static com.kaiasia.app.service.Auth_api.utils.ServiceUltil.takeRespose;
 
 @KaiService
 @Slf4j
@@ -29,7 +35,17 @@ public class GetOTPService {
 
     @Autowired
     private IAuthOTPDao authOTPService;
+
     private ApiError apiError;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private ResetPwdUtils resetPwdUtils;
+
+    @Autowired
+    private KafkaUtils kafkaUtils;
 
     @KaiMethod(name = "getOTP", type = Register.VALIDATE)
     public ApiError validate(ApiRequest req) {
@@ -45,7 +61,6 @@ public class GetOTPService {
         String gmail = (String) enquiry.get("gmail");
         String transTime = (String) enquiry.get("transTime");
         String transId = (String) enquiry.get("transId");
-        String tempId = (String) enquiry.get("tempId");
 
         if (sessionId == null || sessionId.trim().isEmpty()) {
             return apiErrorUtils.getError("706", new String[]{"sessionId"});
@@ -67,9 +82,6 @@ public class GetOTPService {
             return apiErrorUtils.getError("706", new String[]{"transId"});
         }
 
-        if (tempId == null || tempId.trim().isEmpty()) {
-            return apiErrorUtils.getError("706", new String[]{"tempId"});
-        }
 
         return new ApiError(ApiError.OK_CODE, ApiError.OK_DESC);
     }
@@ -84,10 +96,36 @@ public class GetOTPService {
 
         ApiResponse apiResponse = new ApiResponse();
 
-
+        Auth2Request auth2Request = objectMapper.convertValue(enquiry,Auth2Request.class);
 
         try {
-            String generateOTP = authOTPService.generateAndSaveOTP(enquiry);
+
+
+            String generateOTP = resetPwdUtils.generateValidateCode();
+
+            Auth2InsertDb auth2InsertDb = Auth2InsertDb.builder()
+                    .transId(auth2Request.getTransId())
+                    .validateCode(generateOTP)
+                    .username(auth2Request.getUsername())
+                    .sessionId("158963500-20161118132811-1479450491947")
+                    .channel(req.getHeader().getChannel())
+                    .location(req.getHeader().getLocation())
+                    .startTime(Timestamp.valueOf(LocalDateTime.now()))
+                    .endTime(Timestamp.valueOf(LocalDateTime.now().plusMinutes(2)))
+                    .status(auth2Request.getSmsParams().getTempId() + "_CONFIRM")
+                    .transTime("20161108122000")
+                    .transInfo(auth2Request.getTransInfo())
+                    .confirmTime(Timestamp.valueOf(LocalDateTime.now()))
+                    .build();
+
+            int result = authOTPService.insertOTP(auth2InsertDb);
+
+            if(result == 0){
+                ApiError apiError = apiErrorUtils.getError("800");
+                apiResponse.setError(apiError);
+                log.info(LOCATION + "#END#Duration:" + (System.currentTimeMillis() - a));
+                return apiResponse;
+            }
 
             boolean isOTPValid = authOTPService.compareOTPAndCheckExpiration(enquiry);
 
@@ -97,6 +135,10 @@ public class GetOTPService {
                 log.info(LOCATION + "#END#Duration:" + (System.currentTimeMillis() - a));
                 return apiResponse;
             }
+
+            log.info("SEND TO KAFKA");
+            kafkaUtils.sendMessage("hoang@gmail.com",generateOTP);
+
             GetOTPResponse response = new GetOTPResponse();
             response.setResponseCode("00");
             response.setTransId(enquiry.get("transId").toString());

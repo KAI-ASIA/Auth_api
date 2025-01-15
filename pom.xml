@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.kaiasia</groupId>
     <artifactId>AUTH_API</artifactId>
-    <version>01</version>
+    <version>20241209</version>
     <name>app</name>
     <description>Common Framework for KaiAsia</description>
     <properties>
@@ -63,6 +63,7 @@
             <artifactId>reflections</artifactId>
             <version>0.9.10</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
@@ -83,11 +84,11 @@
         <!--            <artifactId>httpclient</artifactId>-->
         <!--            <version>4.5.13</version>-->
         <!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>ms.kaiasia.client</groupId>-->
-<!--            <artifactId>kai-client</artifactId>-->
-<!--            <version>20250107</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>ms.kaiasia.client</groupId>-->
+        <!--            <artifactId>kai-client</artifactId>-->
+        <!--            <version>20250107</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>ms.kaiasia.client</groupId>
             <artifactId>kai-client</artifactId>
@@ -99,7 +100,7 @@
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
-            <version>2.8.0</version>
+            <!--            <version>2.8.0</version>-->
         </dependency>
 
     </dependencies>

@@ -148,7 +148,7 @@ public class ResetPasswordRequestService {
         String resetCode = resetPwdUtils.generateValidateCode();
 
 
-        // cần take session để insert vào db
+
 
         Auth5InsertDb auth5InsertDb = Auth5InsertDb.builder()
                 .transId(auth5Request.getTransId())
@@ -160,9 +160,13 @@ public class ResetPasswordRequestService {
                 .endTime(expirationTime)
                 .build();
 
-
-        int insert = ResetPwdDao.insertResetPwdRecord(auth5InsertDb);
-
+        int insert = 0 ;
+//        try{
+//            insert = ResetPwdDao.insertResetPwdRecord(auth5InsertDb);
+//        }catch (Exception e){
+//            log.info("Unexpected error at location: {}. Error: {}",location,e.getMessage());
+//        }
+        insert = ResetPwdDao.insertResetPwdRecord(auth5InsertDb);
         if(insert == 0 ){
             log.info("INSERT FAIL" + location);
         }else {

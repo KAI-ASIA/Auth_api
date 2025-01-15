@@ -12,7 +12,7 @@ kai:
     code998: "Timeout {0}"
     code701: "API not exist"
     code700: "API key not exists"
-    code804: "Request lacks valid information"
+    code804: "Request lacks valid information: {0}"
     code803: "RequestId not exist"
     code996: "Error insert request to DB#{0}"
     code703: "Enquiry not exist"
@@ -24,7 +24,10 @@ kai:
     code802: "Error retrieving sessionId: {0}"
     code810: "Session {0} has expired"
     code601: "Input OTP is invalid"
+    code505: "Failed to update database"
+    code504: "reset code not match"
     code503: "Failed to read from the database"
+
   time2live: 30 #minutes
 spring:
   application:
@@ -36,10 +39,9 @@ spring:
     url: jdbc:postgresql://14.225.254.212:5432/KAI_API?currentSchema=auth_api
     username: auth_api
     password: auth@kaiasia
-    maximum-pool-size: 10
-    idleTimeout: 60000
-    minimumIdle: 5
-    connectionTimeout: 15000
+    maximum-pool-size: 50
+    idleTimeout: 120000
+    minimumIdle: 10
   jpa:
     show-sql: false
     open-in-view: false
@@ -48,15 +50,6 @@ spring:
       bootstrap-servers: 14.225.254.212:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-
-
-  #kafka:
-  #  bootstrap-servers: 14.225.254.212:9092
-  #  consumer:
-  #    group-id: test-group
-  #  producer:
-  #    key-serializer: org.apache.kafka.common.serialization.StringSerializer
-  #    vale-serializer: org.apache.kafka.common.serialization.StringSerializer
 eureka:
   client:
     service-url:
@@ -99,3 +92,10 @@ kafka_resetpwd:
   topic:
     name : "resetpwd"
 
+
+kafka_getOTP:
+  email:
+    subject: "Giao dich chuyen tien"
+    content: "Ma OTP cua ban la {0}. Co thoi gian 2 phut"
+  topic:
+    name : "getOTP"
