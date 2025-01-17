@@ -26,6 +26,7 @@ kai:
     code601: "Input OTP is invalid"
     code503: "Failed to read from the database"
   time2live: 30 #minutes
+  expireTime: 2 #minutes
 spring:
   application:
     name: AUTH_API
@@ -56,6 +57,7 @@ dbinfo:
   apiRequest: request_in
   apiResponse: request_out
   authSession: auth_session
+#  authOTP: otp
 
 dep-api:
   t24utilsApi:

@@ -25,6 +25,10 @@
 		<property name="tableName" value="${dbinfo.authSession}" />
 	</bean>
 
+<!--	<bean id="iAuthOTPDao" class="com.kaiasia.app.service.Auth_api.dao.IAuthOTPDao">-->
+<!--		<property name="tableName" value="${dbinfo.authOTP}" />-->
+<!--	</bean>-->
+
 	<!--	
 <bean id="t24UtilClient" class="com.kaiasia.app.service.Auth_api.utils.T24UtilClient">-->
 <!--		<property name="url" value="${api.t24Api.url}" />-->

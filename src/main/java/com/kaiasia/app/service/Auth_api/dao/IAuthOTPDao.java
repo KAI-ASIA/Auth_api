@@ -10,7 +10,5 @@ public interface IAuthOTPDao {
     OTP getOTP(HashMap<String, String> body) throws Exception;
     void setConfirmTime( Timestamp now, OTP otp) throws Exception;
 
-    boolean compareOTPAndCheckExpiration(HashMap<String, String> body) throws Exception;
-
     int insertOTP(Auth2InsertDb auth2InsertDb) throws Exception;
 }
