@@ -13,4 +13,12 @@ public class ResetPwdUtils {
         int r = 100000 + random.nextInt(900000);
         return  String.valueOf(r) ;
     }
+
+    public String generateTempSession(){
+        Random random = new Random();
+        int r = 10000000 + random.nextInt(90000000);
+        return  String.valueOf(r) ;
+    }
+
+
 }

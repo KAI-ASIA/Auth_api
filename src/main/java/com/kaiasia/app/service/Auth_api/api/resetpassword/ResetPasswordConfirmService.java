@@ -87,7 +87,6 @@ public class ResetPasswordConfirmService {
                 location,
                 T24Request
                         .builder()
-//                            .username(authTakeSessionResponse.getUsername())
                         .username(auth6Request.getUsername())
                         .build(),
                 req.getHeader()
@@ -100,6 +99,13 @@ public class ResetPasswordConfirmService {
             return apiResponse;
         }
 
+        if(!"ACTIVE".equals(t24UserInfoResponse.getUserStatus())){
+            ApiError apiError = new ApiError(t24UserInfoResponse.getError().getCode(),t24UserInfoResponse.getError().getDesc());
+            apiResponse.setError(apiError);
+            log.info(location + "#USER INACTIVE" + (System.currentTimeMillis() - time));
+            return apiResponse;
+        }
+
         if(t24UserInfoResponse.getCustomerId() == null && t24UserInfoResponse.getCustomerId().isEmpty()){
             ApiError apiError = new ApiError(t24UserInfoResponse.getError().getCode(),t24UserInfoResponse.getError().getDesc());
             apiResponse.setError(apiError);
@@ -107,12 +113,11 @@ public class ResetPasswordConfirmService {
             return apiResponse;
         }
 
-        // thiếu check user có bị khóa không ?
         Auth6ResFromDb auth6ResFromDb = null;
         try{
             auth6ResFromDb = resetPwdDao.getResetPwdRecord(t24UserInfoResponse.getCustomerId());
         }catch (NullPointerException e){
-            ApiError apiError = apiErrorUtils.getError("504");
+            ApiError apiError = apiErrorUtils.getError("503");
             apiResponse.setError(apiError);
             log.info("#FIELD NOT EXIST IN DB - " + location);
             return apiResponse;
@@ -131,6 +136,7 @@ public class ResetPasswordConfirmService {
         }
 
 
+        // đổi mật khaaru
 
 
         HashMap<String , Object> field = new HashMap<>();

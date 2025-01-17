@@ -19,10 +19,13 @@
 		<property name="apiRequestDao" ref="apiRequestDAO" />
 		<property name="apiResponseDAO" ref="apiResponseDAO" />
 	</bean>
-	
 
 	<bean id="sessionIdDAO" class="com.kaiasia.app.service.Auth_api.dao.SessionIdDAO">
 		<property name="tableName" value="${dbinfo.authSession}" />
+	</bean>
+
+	<bean id="resetPwdDao" class="com.kaiasia.app.service.Auth_api.dao.imp.ResetPwdDao">
+		<property name="tableName" value="${dbinfo.otp}" />
 	</bean>
 
 	<!--	

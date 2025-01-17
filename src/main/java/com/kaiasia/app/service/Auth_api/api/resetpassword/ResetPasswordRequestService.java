@@ -23,6 +23,7 @@ import ms.apiclient.t24util.T24UtilClient;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -51,6 +52,9 @@ public class ResetPasswordRequestService {
 
     @Autowired
     private KafkaUtils kafkaUtils;
+
+    @Value("${kafka_resetpwd.timeout}")
+    private int timeOut;
 
 
 
@@ -116,57 +120,53 @@ public class ResetPasswordRequestService {
             return apiResponse;
         }
 
-        if(t24UserInfoResponse.getCustomerId() == null && t24UserInfoResponse.getCustomerId().isEmpty()){
+        if(StringUtils.isBlank(t24UserInfoResponse.getCustomerId()) && t24UserInfoResponse.getCustomerId().isEmpty()){
             ApiError apiError = new ApiError(t24UserInfoResponse.getError().getCode(),t24UserInfoResponse.getError().getDesc());
             apiResponse.setError(apiError);
             log.info(location + "#ID DOES NOT EXIST" + (System.currentTimeMillis() - time));
             return apiResponse;
         }
 
-        // thiếu check user có bị khóa không ?
+        // check user họoạt động
+        if(!"ACTIVE".equals(t24UserInfoResponse.getUserStatus())){
+            ApiError apiError = new ApiError(t24UserInfoResponse.getError().getCode(),t24UserInfoResponse.getError().getDesc());
+            apiResponse.setError(apiError);
+            log.info(location + "#USER INACTIVE" + (System.currentTimeMillis() - time));
+            return apiResponse;
+        }
 
         //check email
-        if(t24UserInfoResponse.getEmail() == null && t24UserInfoResponse.getEmail().isEmpty() ){
+        if(StringUtils.isBlank(t24UserInfoResponse.getEmail()) && t24UserInfoResponse.getEmail().isEmpty() ){
             ApiError apiError = new ApiError(t24UserInfoResponse.getError().getCode(),t24UserInfoResponse.getError().getDesc());
             apiResponse.setError(apiError);
             log.info(location + "#EMAIL DOES NOT EXIST");
             return apiResponse;
         }
 
-//        AuthTakeSessionResponse authTakeSessionResponse = authenClient.takeSession(
-//                    location,
-//                    AuthRequest
-//                            .builder()
-////                            .sessionId(eBankReq.getSessionId())
-//                            .sessionId("158963500-20170110135803-1484031483542")
-//                            .build(),
-//                    req.getHeader()
-//            );
-
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime expirationTime = now.plusMinutes(5);
+        LocalDateTime expirationTime = now.plusMinutes(timeOut);
         String resetCode = resetPwdUtils.generateValidateCode();
-
-
-
 
         Auth5InsertDb auth5InsertDb = Auth5InsertDb.builder()
                 .transId(auth5Request.getTransId())
                 .validateCode(resetCode)
                 .username(t24UserInfoResponse.getCustomerId())
-                .sessionId("158963500-20170110135803-1484031483542")
+                .sessionId(resetPwdUtils.generateTempSession())
                 .channel(header.getChannel())
                 .startTime(now)
                 .endTime(expirationTime)
                 .build();
 
         int insert = 0 ;
-//        try{
-//            insert = ResetPwdDao.insertResetPwdRecord(auth5InsertDb);
-//        }catch (Exception e){
-//            log.info("Unexpected error at location: {}. Error: {}",location,e.getMessage());
-//        }
-        insert = ResetPwdDao.insertResetPwdRecord(auth5InsertDb);
+        try{
+            insert = ResetPwdDao.insertResetPwdRecord(auth5InsertDb);
+        }catch (Exception e){
+            log.info("Unexpected error at location: {}. Error: {}",location,e.getMessage());
+            ApiError apiError = new ApiError(t24UserInfoResponse.getError().getCode(),t24UserInfoResponse.getError().getDesc());
+            apiResponse.setError(apiError);
+            return apiResponse;
+        }
+
         if(insert == 0 ){
             log.info("INSERT FAIL" + location);
         }else {

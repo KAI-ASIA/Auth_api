@@ -59,6 +59,7 @@ dbinfo:
   apiRequest: request_in
   apiResponse: request_out
   authSession: auth_session
+  otp: otp
 
 dep-api:
   t24utilsApi:
@@ -91,6 +92,8 @@ kafka_resetpwd:
     content: "Mã thay đổi mật khẩu của bạn là :{0}"
   topic:
     name : "resetpwd"
+  timeout: 5
+
 
 
 kafka_getOTP:

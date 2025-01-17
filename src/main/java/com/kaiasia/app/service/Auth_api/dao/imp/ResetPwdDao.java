@@ -1,10 +1,10 @@
 package com.kaiasia.app.service.Auth_api.dao.imp;
 
+import com.kaiasia.app.core.dao.CommonDAO;
 import com.kaiasia.app.core.dao.PosgrestDAOHelper;
 import com.kaiasia.app.service.Auth_api.dao.IResetPwdDao;
 import com.kaiasia.app.service.Auth_api.model.Auth5InsertDb;
 import com.kaiasia.app.service.Auth_api.model.Auth6ResFromDb;
-import com.kaiasia.app.service.Auth_api.model.OTP;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -15,7 +15,7 @@ import java.util.HashMap;
 
 @Service
 @Slf4j
-public class ResetPwdDao implements IResetPwdDao {
+public class ResetPwdDao extends CommonDAO implements IResetPwdDao {
 
     @Autowired
     private PosgrestDAOHelper posgrestDAOHelper;
@@ -23,7 +23,7 @@ public class ResetPwdDao implements IResetPwdDao {
     @Override
     public int insertResetPwdRecord(Auth5InsertDb fields) {
 
-        String sql = "INSERT INTO auth_api.otp (trans_id, validate_code, username, channel, location, session_id, "
+        String sql = "INSERT INTO "+this.getTableName()+" (trans_id, validate_code, username, channel, location, session_id, "
                 + "start_time, end_time, confirm_time, trans_info, trans_time) "
                 + "VALUES (:trans_id, :validate_code, :username, :channel, :location, :session_id, "
                 + ":start_time, :end_time, :confirm_time, :trans_info, :trans_time)";
@@ -55,17 +55,15 @@ public class ResetPwdDao implements IResetPwdDao {
     }
 
     @Override
-    public Auth6ResFromDb getResetPwdRecord( String username) {
-
-        String sql = "SELECT auth_api.otp.validate_code FROM auth_api.otp WHERE auth_api.otp.username = :username";
+    public Auth6ResFromDb getResetPwdRecord(String username) {
+        StringBuilder sql = new StringBuilder("SELECT validate_code FROM").append(this.getTableName()).append("WHERE username = :username");
 
         HashMap<String , Object> param = new HashMap<>();
-//        param.put("transId",transId);
         param.put("username",username);
 
         Auth6ResFromDb auth6ResFromDb ;
         try {
-            auth6ResFromDb = posgrestDAOHelper.querySingle(sql,param, new BeanPropertyRowMapper<>(Auth6ResFromDb.class));
+            auth6ResFromDb = posgrestDAOHelper.querySingle(sql.toString(),param, new BeanPropertyRowMapper<>(Auth6ResFromDb.class));
         } catch (Exception e) {
             log.info("Error get record with username: {} ERROR :{}", username,e);
             throw new RuntimeException("Error while get record", e);
