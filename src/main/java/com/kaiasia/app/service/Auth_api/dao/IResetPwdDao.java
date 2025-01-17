@@ -5,7 +5,7 @@ import com.kaiasia.app.service.Auth_api.model.Auth6ResFromDb;
 
 public interface IResetPwdDao {
 
-    public int insertResetPwdRecord(Auth5InsertDb Fields);
+    int insertResetPwdRecord(Auth5InsertDb Fields);
 
-    public Auth6ResFromDb getResetPwdRecord( String username);
+    Auth6ResFromDb getResetPwdRecord( String username);
 }

@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 
 
-@Service
 @Slf4j
 public class ResetPwdDao extends CommonDAO implements IResetPwdDao {
 
