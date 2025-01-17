@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Value;
 //import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties.Env;
 import org.springframework.core.env.Environment;
 
+import java.util.Date;
+
 //import java.util.Date;
 
 @KaiService
@@ -80,8 +82,9 @@ public class TakeSessionService extends BaseService {
 
         
         //TODO check them: expireTime
-        long expireTime = authSessionResponse.getEndTime().getTime() - authSessionResponse.getStartTime().getTime();
-        if(expireTime > time2livee*60*1000){
+        Date date = new Date();
+        long now = date.getTime();
+        if(authSessionResponse.getEndTime().getTime() <  now){
             ApiError apiError  = apiErrorUtils.getError("810", new String[]{enquiry.getSessionId()});
             log.info(LOCATION + "#END#Duration:" + (System.currentTimeMillis() - a));
             apiResponse.setError(apiError);
