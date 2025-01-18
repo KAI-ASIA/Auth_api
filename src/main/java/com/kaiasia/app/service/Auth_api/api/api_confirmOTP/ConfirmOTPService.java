@@ -12,6 +12,7 @@ import com.kaiasia.app.service.Auth_api.dao.IAuthOTPDao;
 import com.kaiasia.app.service.Auth_api.model.Auth3Request;
 import com.kaiasia.app.service.Auth_api.model.Auth3Response;
 import com.kaiasia.app.service.Auth_api.model.OTP;
+import com.kaiasia.app.service.Auth_api.utils.AuthTakeSession;
 import lombok.extern.slf4j.Slf4j;
 import ms.apiclient.model.ApiError;
 import ms.apiclient.model.ApiRequest;
@@ -37,6 +38,9 @@ public class ConfirmOTPService extends BaseService {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private AuthTakeSession authTakeSession;
+
     @KaiMethod(name = "confirmOTP", type = Register.VALIDATE)
     public ApiError validate(ApiRequest req) {
         if (req.getBody() == null) {
@@ -44,19 +48,19 @@ public class ConfirmOTPService extends BaseService {
         }
         Auth3Request enquiry = objectMapper.convertValue(getEnquiry(req), Auth3Request.class);
 
-        if(StringUtils.isBlank(enquiry.getOtp())){
+        if (StringUtils.isBlank(enquiry.getOtp())) {
             return apiErrorUtils.getError("706", new String[]{"#userName"});
         }
-        if(StringUtils.isBlank(enquiry.getSessionId())){
+        if (StringUtils.isBlank(enquiry.getSessionId())) {
             return apiErrorUtils.getError("706", new String[]{"#password"});
         }
-        if(StringUtils.isBlank(enquiry.getUsername())){
+        if (StringUtils.isBlank(enquiry.getUsername())) {
             return apiErrorUtils.getError("706", new String[]{"#password"});
         }
-        if(StringUtils.isBlank(enquiry.getTransId())){
+        if (StringUtils.isBlank(enquiry.getTransId())) {
             return apiErrorUtils.getError("706", new String[]{"#password"});
         }
-        if(StringUtils.isBlank(enquiry.getTransTime())){
+        if (StringUtils.isBlank(enquiry.getTransTime())) {
             return apiErrorUtils.getError("706", new String[]{"#password"});
         }
         return new ApiError(ApiError.OK_CODE, ApiError.OK_DESC);
@@ -68,16 +72,16 @@ public class ConfirmOTPService extends BaseService {
         Auth3Request enquiry = objectMapper.convertValue(getEnquiry(req), Auth3Request.class);
         log.info("Body print:");
         String location = "ConfirmOTP" + enquiry.getSessionId() + "_" + System.currentTimeMillis();
-
-//        ApiHelper<ApiBody> callAPI = new ApiHelper<ApiBody>();
-//        HttpHeaders httpHeaders = new HttpHeaders();
-//        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-//        String body = "";
-//        ApiResponse sesionID = callAPI.call("", HttpMethod.POST , httpHeaders, );
-
         Auth3Response auth3Response = new Auth3Response();
         auth3Response.setResponseCode("00");
         auth3Response.setTransId(enquiry.getTransId().toString());
+
+        //Call takeSession API
+        ApiResponse checkSessionId = authTakeSession.callTakeSessionAPI(enquiry.getSessionId());
+        if (checkSessionId.getError() != null) {
+            ApiError apiError = apiErrorUtils.getError(checkSessionId.getError().getCode().toString(), new String[]{});
+            return takeRespose(auth3Response, apiError);
+        }
 
         //Lay OTP tu database
         OTP otp = new OTP();
@@ -85,7 +89,7 @@ public class ConfirmOTPService extends BaseService {
             otp = authOTPService.getOTP(enquiry.getSessionId().toString(), enquiry.getUsername().toString(), enquiry.getTransId().toString());
         } catch (Exception e) {
             log.error("{}:{}", location, e.getMessage());
-            ApiError apiError = apiErrorUtils.getError("503", new String[] {e.getMessage()});
+            ApiError apiError = apiErrorUtils.getError("503", new String[]{});
             return takeRespose(auth3Response, apiError);
         }
         //Neu OTP khong ton tai tra ve loi
