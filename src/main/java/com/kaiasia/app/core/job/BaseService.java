@@ -9,7 +9,7 @@ import ms.apiclient.model.ApiRequest;
 import ms.apiclient.model.ApiResponse;
 
 public class BaseService {
-    public Map<String, Object> getEnquiry(ApiRequest request){
+    public static Map<String, Object> getEnquiry(ApiRequest request){
         return (Map<String, Object>) request.getBody().get(ApiConstant.COMMAND.ENQUIRY);
     }
 

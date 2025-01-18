@@ -27,6 +27,7 @@ kai:
     code505: "Failed to update database"
     code504: "reset code not match"
     code503: "Failed to read from the database"
+    code506: "The data does not exist in the database"
 
   time2live: 30 #minutes
 spring:
