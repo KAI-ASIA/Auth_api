@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Value;
 //import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties.Env;
 import org.springframework.core.env.Environment;
 
+import java.util.Date;
+
 //import java.util.Date;
 
 @KaiService
@@ -67,9 +69,7 @@ public class TakeSessionService extends BaseService {
 
         // Lấy thông tin session từ DB
         AuthSessionResponse authSessionResponse = sessionIdDAO.getAuthSessionId(enquiry.getSessionId());
-//        String LOCATION = apiRequest.getHeader().getChannel() + "-" +
-//                (authSessionResponse != null ? authSessionResponse.getUsername() : "Unknown") +
-//                "-" + enquiry.getLoginTime();
+
         String LOCATION = enquiry.getSessionId();
         // Kiểm tra session có tồn tại không
         if (authSessionResponse == null) {
@@ -82,8 +82,9 @@ public class TakeSessionService extends BaseService {
 
         
         //TODO check them: expireTime
-        long expireTime = authSessionResponse.getEndTime().getTime() - authSessionResponse.getStartTime().getTime();
-        if(expireTime > time2livee*60*1000){
+        Date date = new Date();
+        long now = date.getTime();
+        if(authSessionResponse.getEndTime().getTime() <  now){
             ApiError apiError  = apiErrorUtils.getError("810", new String[]{enquiry.getSessionId()});
             log.info(LOCATION + "#END#Duration:" + (System.currentTimeMillis() - a));
             apiResponse.setError(apiError);
