@@ -55,7 +55,7 @@ public class ResetPwdDao extends CommonDAO implements IResetPwdDao {
 
     @Override
     public Auth6ResFromDb getResetPwdRecord(String username) {
-        StringBuilder sql = new StringBuilder("SELECT validate_code FROM").append(this.getTableName()).append("WHERE username = :username");
+        StringBuilder sql = new StringBuilder("SELECT validate_code FROM ").append(this.getTableName()).append(" WHERE username = :username");
 
         HashMap<String , Object> param = new HashMap<>();
         param.put("username",username);

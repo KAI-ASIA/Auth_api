@@ -11,6 +11,7 @@ import com.kaiasia.app.service.Auth_api.model.Auth6Request;
 import com.kaiasia.app.service.Auth_api.model.Auth6ResFromDb;
 import lombok.extern.slf4j.Slf4j;
 import ms.apiclient.model.*;
+import ms.apiclient.t24util.T24ChangePasswordResponse;
 import ms.apiclient.t24util.T24Request;
 import ms.apiclient.t24util.T24UserInfoResponse;
 import ms.apiclient.t24util.T24UtilClient;
@@ -37,33 +38,29 @@ public class ResetPasswordConfirmService {
 
     @KaiMethod(name = "setPassword" , type = Register.VALIDATE)
     public ApiError validate(ApiRequest req) throws Exception {
-
-        HashMap enquiry = (HashMap) req.getBody().get("enquiry");
         String chanel = req.getHeader().getChannel();
-        String username = (String) enquiry.get("username");
-        String transId = (String) enquiry.get("transId");
-        String resetCode = (String) enquiry.get("resetCode");
-        String newPwd = (String) enquiry.get("newPassword");
+        Auth6Request auth6Req = objectMapper.convertValue(req.getBody().get("enquiry"), Auth6Request.class);
+
         long time = System.currentTimeMillis();
-        String location = chanel +"-"+ username +"-"+ transId +"-"+ time;
+        String location = chanel +"-"+ auth6Req.getUsername() +"-"+ auth6Req.getTransId() +"-"+ time;
 
         if (req.getBody() == null) {
             log.info("#BODY NULL" + location);
             return apiErrorUtils.getError("804", new String[]{"Missing request body!"});
         }
-        if (StringUtils.isBlank(username)) {
+        if (StringUtils.isBlank(auth6Req.getUsername())) {
             log.info("#FIELD USERNAME NULL" + location);
             return apiErrorUtils.getError("804", new String[]{"Missing field username!"});
         }
-        if (StringUtils.isBlank(resetCode)) {
+        if (StringUtils.isBlank(auth6Req.getResetCode())) {
             log.info("#FIELD RESET CODE NULL" + location);
             return apiErrorUtils.getError("804", new String[]{"Missing field reset code!"});
         }
-        if ( StringUtils.isBlank(newPwd)) {
+        if ( StringUtils.isBlank(auth6Req.getNewPassword())) {
             log.info("FIELD #NEW PASSWORD NULL" + location);
             return apiErrorUtils.getError("804", new String[]{"Missing field new password!"});
         }
-        if (StringUtils.isBlank(transId)) {
+        if (StringUtils.isBlank(auth6Req.getTransId())) {
             log.info("#FIELD TRANSID NULL" + location);
             return apiErrorUtils.getError("804", new String[]{"Missing field transId!"});
         }
@@ -76,8 +73,7 @@ public class ResetPasswordConfirmService {
         ApiBody body = new ApiBody();
         ApiHeader header = req.getHeader();
         apiResponse.setHeader(header);
-        Object enquiry = req.getBody().get("enquiry");
-        Auth6Request auth6Request = objectMapper.convertValue(enquiry, Auth6Request.class);
+        Auth6Request auth6Request = objectMapper.convertValue(req.getBody().get("enquiry"), Auth6Request.class);
 
         long time = System.currentTimeMillis();
         String location = auth6Request.getTransId()+"-"+auth6Request.getUsername()+"-"+time;
@@ -92,10 +88,9 @@ public class ResetPasswordConfirmService {
                 req.getHeader()
         );
 
-        if(t24UserInfoResponse.getError() != null){
-            ApiError apiError = new ApiError(t24UserInfoResponse.getError().getCode(),t24UserInfoResponse.getError().getDesc());
-            apiResponse.setError(apiError);
+        if(t24UserInfoResponse.getError() != null && !ApiError.OK_CODE.equals(t24UserInfoResponse.getError().getCode())){
             log.info(location + "#END CALL USER INFO" + (System.currentTimeMillis() - time));
+            apiResponse.setError(t24UserInfoResponse.getError());
             return apiResponse;
         }
 
@@ -135,9 +130,21 @@ public class ResetPasswordConfirmService {
             return apiResponse;
         }
 
-
-        // đổi mật khaaru
-
+        log.info(location + "#BEGIN CALL CHANGE PASSWORD");
+        T24ChangePasswordResponse t24ChangePasswordResponse = t24UtilClient.changePassword(
+                location,
+                T24Request.builder()
+                        .username(auth6Request.getUsername())
+                        .newPassword(auth6Request.getNewPassword())
+                        .build(),
+                req.getHeader()
+        );
+        log.error(t24ChangePasswordResponse.getError().getCode());
+        if (t24ChangePasswordResponse.getError() != null && !ApiError.OK_CODE.equals(t24ChangePasswordResponse.getError().getCode())){
+            log.info(location + "#ERROR WHILE CHANGE PASSWORD" + (System.currentTimeMillis() - time));
+            apiResponse.setError(t24ChangePasswordResponse.getError());
+            return apiResponse;
+        }
 
         HashMap<String , Object> field = new HashMap<>();
         field.put("responseCode","00");

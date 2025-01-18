@@ -12,11 +12,7 @@ import com.kaiasia.app.service.Auth_api.model.Auth5InsertDb;
 import com.kaiasia.app.service.Auth_api.model.Auth5Request;
 import com.kaiasia.app.service.Auth_api.utils.ResetPwdUtils;
 import lombok.extern.slf4j.Slf4j;
-import ms.apiclient.authen.AuthRequest;
-import ms.apiclient.authen.AuthTakeSessionResponse;
-import ms.apiclient.authen.AuthenClient;
 import ms.apiclient.model.*;
-import ms.apiclient.t24util.T24CustomerInfoResponse;
 import ms.apiclient.t24util.T24Request;
 import ms.apiclient.t24util.T24UserInfoResponse;
 import ms.apiclient.t24util.T24UtilClient;
@@ -42,9 +38,6 @@ public class ResetPasswordRequestService {
     private T24UtilClient t24UtilClient;
 
     @Autowired
-    private  AuthenClient authenClient;
-
-    @Autowired
     private IResetPwdDao ResetPwdDao;
 
     @Autowired
@@ -60,28 +53,23 @@ public class ResetPasswordRequestService {
 
     @KaiMethod(name = "resetPassword" , type = Register.VALIDATE)
     public ApiError validate(ApiRequest req) throws Exception {
-
-        HashMap enquiry = (HashMap) req.getBody().get("enquiry");
         String channel = req.getHeader().getChannel();
-        String username = (String) enquiry.get("username");
-        String transId = (String) enquiry.get("transId");
+
+        Auth5Request auth5Request = objectMapper.convertValue(req.getBody().get("enquiry"),Auth5Request.class);
+
         long time = System.currentTimeMillis();
-        String location = channel +"-"+ username +"-"+ transId +"-"+ time;
+        String location = channel +"-"+ auth5Request.getUsername() +"-"+ auth5Request.getTransId() +"-"+ time;
 
         if (req.getBody() == null) {
             log.info("#BODY NULL" + location);
             return apiErrorUtils.getError("804", new String[]{"Missing request body!"});
         }
-        if (enquiry == null) {
-            log.info("#ENQUIRY NULL" + location);
-            return apiErrorUtils.getError("804", new String[]{"Missing enquiry part!"});
-        }
 
-        if(StringUtils.isBlank(username)){
+        if(StringUtils.isBlank(auth5Request.getUsername())){
             log.info("#FIELD NAME NULL" + location);
             return apiErrorUtils.getError("804", new String[]{"Missing field name !"});
         }
-        if(StringUtils.isBlank(transId)){
+        if(StringUtils.isBlank(auth5Request.getTransId())){
             log.info("#FIELD TRANSID NULL" + location);
             return apiErrorUtils.getError("804", new String[]{"Missing field transId !"});
         }
@@ -95,8 +83,8 @@ public class ResetPasswordRequestService {
         ApiBody body = new ApiBody();
         ApiHeader header = req.getHeader();
         apiResponse.setHeader(header);
-        Object enquiry = req.getBody().get("enquiry");
-        Auth5Request auth5Request = objectMapper.convertValue(enquiry,Auth5Request.class);
+
+        Auth5Request auth5Request = objectMapper.convertValue(req.getBody().get("enquiry"),Auth5Request.class);
 
         String chanel = header.getChannel();
         long time = System.currentTimeMillis();
@@ -107,16 +95,14 @@ public class ResetPasswordRequestService {
                 location,
                 T24Request
                         .builder()
-//                            .username(authTakeSessionResponse.getUsername())
                         .username(auth5Request.getUsername())
                         .build(),
                 req.getHeader()
         );
 
-        if(t24UserInfoResponse.getError() != null){
-            ApiError apiError = new ApiError(t24UserInfoResponse.getError().getCode(),t24UserInfoResponse.getError().getDesc());
-            apiResponse.setError(apiError);
+        if(t24UserInfoResponse.getError() != null && !ApiError.OK_CODE.equals(t24UserInfoResponse.getError().getCode())){
             log.info(location + "#END CALL USER INFO" + (System.currentTimeMillis() - time));
+            apiResponse.setError(t24UserInfoResponse.getError());
             return apiResponse;
         }
 
@@ -174,7 +160,7 @@ public class ResetPasswordRequestService {
         }
 
 
-        log.info("SEND TO KAFKA");
+        log.info(location + "#SEND TO KAFKA");
         kafkaUtils.sendMessage(t24UserInfoResponse.getEmail(),resetCode);
 
 

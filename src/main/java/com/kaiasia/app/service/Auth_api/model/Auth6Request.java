@@ -11,6 +11,6 @@ import lombok.Data;
 public class Auth6Request {
     private String username ;
     private String transId ;
-    private String newPassWord;
+    private String newPassword;
     private String resetCode;
 }
