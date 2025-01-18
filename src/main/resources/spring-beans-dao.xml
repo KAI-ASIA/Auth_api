@@ -20,6 +20,10 @@
 		<property name="apiResponseDAO" ref="apiResponseDAO" />
 	</bean>
 
+	<bean id="AuthOTPDao" class="com.kaiasia.app.service.Auth_api.dao.imp.AuthOTPDao">
+		<property name="tableName" value="${dbinfo.otp}" />
+	</bean>
+
 	<bean id="sessionIdDAO" class="com.kaiasia.app.service.Auth_api.dao.SessionIdDAO">
 		<property name="tableName" value="${dbinfo.authSession}" />
 	</bean>
