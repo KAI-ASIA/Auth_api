@@ -9,7 +9,6 @@ import com.kaiasia.app.service.Auth_api.api.takesession.TakeSessionService;
 import com.kaiasia.app.service.Auth_api.dao.SessionIdDAO;
 import com.kaiasia.app.service.Auth_api.dto.SessionResponse;
 import com.kaiasia.app.service.Auth_api.model.AuthSessionResponse;
-import lombok.extern.slf4j.Slf4j;
 import ms.apiclient.model.ApiBody;
 import ms.apiclient.model.ApiError;
 import ms.apiclient.model.ApiResponse;
@@ -17,15 +16,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-import ms.apiclient.model.ApiError;
-import ms.apiclient.model.ApiRequest;
-import ms.apiclient.model.ApiResponse;
 
 import java.util.Date;
 
 @Component
-public class AuthTakeSession extends BaseService {
+public class AuthTakeSession {
 
     private static final Logger log = LoggerFactory.getLogger(TakeSessionService.class);
     @Autowired
@@ -37,18 +32,27 @@ public class AuthTakeSession extends BaseService {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public ApiResponse TakeSessionService(ApiRequest apiRequest) throws Exception {
-        long a = System.currentTimeMillis();
-        Enquiry enquiry = objectMapper.convertValue(getEnquiry(apiRequest), Enquiry.class);
-        ApiResponse apiResponse = new ApiResponse();
+    public ApiResponse callTakeSessionAPI(String sessionId) {
+        Enquiry enquiry = new Enquiry();
+        enquiry.setSessionId(sessionId);
+        return TakeSessionService(enquiry);
+    }
 
+    public ApiResponse TakeSessionService(Enquiry enquiry) {
+        long a = System.currentTimeMillis();
+        ApiResponse apiResponse = new ApiResponse();
 
         String LOCATION = enquiry.getSessionId();
         // Lấy thông tin session từ DB
-
-            AuthSessionResponse authSessionResponse = sessionIdDAO.getAuthSessionId(enquiry.getSessionId());
-
-
+        AuthSessionResponse authSessionResponse = null;
+        try {
+            authSessionResponse = sessionIdDAO.getAuthSessionId(enquiry.getSessionId());
+        } catch (Exception e) {
+            log.error("{}:{}", LOCATION, e.getMessage());
+            ApiError apiError = apiErrorUtils.getError("503", new String[]{});
+            apiResponse.setError(apiError);
+            return apiResponse;
+        }
 
         // Kiểm tra session có tồn tại không
         if (authSessionResponse == null) {
@@ -70,7 +74,15 @@ public class AuthTakeSession extends BaseService {
         }
 
         // update session Id time
-        int updateExpireTime = sessionIdDAO.updateExpireSessionId(enquiry.getSessionId());
+        int updateExpireTime = 0;
+        try {
+            updateExpireTime = sessionIdDAO.updateExpireSessionId(enquiry.getSessionId());
+        } catch (Exception e) {
+            log.error("{}:{}", LOCATION, e.getMessage());
+            ApiError apiError = apiErrorUtils.getError("503", new String[]{});
+            return apiResponse;
+        }
+
         if (updateExpireTime == 0) {
             log.error(LOCATION + "#Error updating session expiration for sessionId:" + enquiry.getSessionId());
         } else {
