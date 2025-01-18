@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.kaiasia</groupId>
-    <artifactId>app</artifactId>
+    <artifactId>AUTH_API</artifactId>
     <version>20241209</version>
     <name>app</name>
     <description>Common Framework for KaiAsia</description>
