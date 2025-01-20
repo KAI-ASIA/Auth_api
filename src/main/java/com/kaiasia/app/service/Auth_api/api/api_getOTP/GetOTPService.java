@@ -17,6 +17,7 @@ import com.kaiasia.app.service.Auth_api.kafka.resetpwd.KafkaUtils;
 import com.kaiasia.app.service.Auth_api.model.Auth2InsertDb;
 import com.kaiasia.app.service.Auth_api.model.Auth2Request;
 import com.kaiasia.app.service.Auth_api.model.AuthSessionResponse;
+import com.kaiasia.app.service.Auth_api.utils.AuthTakeSession;
 import com.kaiasia.app.service.Auth_api.utils.ResetPwdUtils;
 import com.kaiasia.app.service.Auth_api.utils.StatusOTPEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ import ms.apiclient.model.ApiResponse;
 import ms.apiclient.t24util.T24Request;
 import ms.apiclient.t24util.T24UserInfoResponse;
 import ms.apiclient.t24util.T24UtilClient;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -62,46 +64,38 @@ public class GetOTPService extends BaseService {
     @Autowired
     private SessionIdDAO sessionIdDAO;
 
+    @Autowired
+    private AuthTakeSession authTakeSession;
+
     @Value("${kai.expireTime}")
     private int expireTime;
 
     @KaiMethod(name = "getOTP", type = Register.VALIDATE)
     public ApiError validate(ApiRequest req) {
 
-        ApiBody apiBody = req.getBody();
-        Object value = apiBody.get("enquiry");
-        HashMap enquiry = (HashMap) apiBody.get("enquiry");
-        if (enquiry == null) {
-            return apiErrorUtils.getError("804", new String[]{"Missing enquiry part!"});
-        }
-        String sessionId = (String) enquiry.get("sessionId");
-        String username = (String) enquiry.get("username");
-        String gmail = (String) enquiry.get("gmail");
-        String transTime = (String) enquiry.get("transTime");
-        String transId = (String) enquiry.get("transId");
-        String transDesc = (String) enquiry.get("transInfo");
+        Auth2Request enquiry = objectMapper.convertValue(getEnquiry(req), Auth2Request.class);
 
-        if (sessionId == null || sessionId.trim().isEmpty()) {
+        if (StringUtils.isBlank(enquiry.getSessionId())) {
             return apiErrorUtils.getError("706", new String[]{"sessionId"});
         }
 
-        if (username == null || username.trim().isEmpty()) {
+        if (StringUtils.isBlank(enquiry.getUsername())) {
             return apiErrorUtils.getError("706", new String[]{"username"});
         }
 
-        if (gmail == null || gmail.trim().isEmpty()) {
+        if (StringUtils.isBlank(enquiry.getGmail())) {
             return apiErrorUtils.getError("706", new String[]{"gmail"});
         }
 
-        if (transTime == null || transTime.trim().isEmpty()) {
+        if (StringUtils.isBlank(enquiry.getTransTime())) {
             return apiErrorUtils.getError("706", new String[]{"transTime"});
         }
 
-        if (transId == null || transId.trim().isEmpty()) {
+        if (StringUtils.isBlank(enquiry.getTransId())) {
             return apiErrorUtils.getError("706", new String[]{"transId"});
         }
 
-        if (transDesc == null || transDesc.trim().isEmpty()) {
+        if (StringUtils.isBlank(enquiry.getTransInfo())) {
             return apiErrorUtils.getError("706", new String[]{"transDesc"});
         }
 
@@ -118,22 +112,15 @@ public class GetOTPService extends BaseService {
 
         Auth2Request auth2Request = objectMapper.convertValue(enquiry, Auth2Request.class);
 
-        AuthSessionResponse authSessionResponse = sessionIdDAO.getAuthSessionId(enquiry.getSessionId());
+        String LOCATION = "GetOTP" + enquiry.getSessionId() + "_" + System.currentTimeMillis();
 
-        String LOCATION = "GetOTP" + enquiry.getSessionId();
-
-        if (authSessionResponse == null){
+        ApiResponse checkSessionID = authTakeSession.callTakeSessionAPI(enquiry.getSessionId());
+        if (checkSessionID.getError() != null){
             ApiError apiError = apiErrorUtils.getError("801", new String[]{enquiry.getSessionId()});
             log.info(LOCATION + "#END#Duration:" + (System.currentTimeMillis() - a));
             apiResponse.setError(apiError);
             return apiResponse;
-        }
 
-        if (authSessionResponse.getEndTime().getTime() < a){
-            ApiError apiError = apiErrorUtils.getError("810", new String[]{enquiry.getSessionId()});
-            log.info(LOCATION + "#END#Duration:" + (System.currentTimeMillis() - a));
-            apiResponse.setError(apiError);
-            return apiResponse;
         }
 
         log.info(LOCATION + "#BEGIN CALL USER INFO");
