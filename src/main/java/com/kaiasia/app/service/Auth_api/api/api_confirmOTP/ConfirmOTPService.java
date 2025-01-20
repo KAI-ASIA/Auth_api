@@ -12,7 +12,9 @@ import com.kaiasia.app.service.Auth_api.dao.IAuthOTPDao;
 import com.kaiasia.app.service.Auth_api.model.Auth3Request;
 import com.kaiasia.app.service.Auth_api.model.Auth3Response;
 import com.kaiasia.app.service.Auth_api.model.OTP;
+import com.kaiasia.app.service.Auth_api.model.validation.Auth3Validation;
 import com.kaiasia.app.service.Auth_api.utils.AuthTakeSession;
+import com.kaiasia.app.service.Auth_api.utils.ServiceUltil;
 import lombok.extern.slf4j.Slf4j;
 import ms.apiclient.model.ApiError;
 import ms.apiclient.model.ApiRequest;
@@ -30,7 +32,7 @@ import static com.kaiasia.app.service.Auth_api.utils.ServiceUltil.takeRespose;
 public class ConfirmOTPService extends BaseService {
 
     @Autowired
-    GetErrorUtils apiErrorUtils;
+    private GetErrorUtils apiErrorUtils;
 
     @Autowired
     private IAuthOTPDao authOTPService;
@@ -43,27 +45,28 @@ public class ConfirmOTPService extends BaseService {
 
     @KaiMethod(name = "confirmOTP", type = Register.VALIDATE)
     public ApiError validate(ApiRequest req) {
-        if (req.getBody() == null) {
-            return apiErrorUtils.getError("804", new String[]{"Missing request body!"});
-        }
-        Auth3Request enquiry = objectMapper.convertValue(getEnquiry(req), Auth3Request.class);
-
-        if (StringUtils.isBlank(enquiry.getOtp())) {
-            return apiErrorUtils.getError("706", new String[]{"#userName"});
-        }
-        if (StringUtils.isBlank(enquiry.getSessionId())) {
-            return apiErrorUtils.getError("706", new String[]{"#password"});
-        }
-        if (StringUtils.isBlank(enquiry.getUsername())) {
-            return apiErrorUtils.getError("706", new String[]{"#password"});
-        }
-        if (StringUtils.isBlank(enquiry.getTransId())) {
-            return apiErrorUtils.getError("706", new String[]{"#password"});
-        }
-        if (StringUtils.isBlank(enquiry.getTransTime())) {
-            return apiErrorUtils.getError("706", new String[]{"#password"});
-        }
-        return new ApiError(ApiError.OK_CODE, ApiError.OK_DESC);
+//        if (req.getBody() == null) {
+//            return apiErrorUtils.getError("804", new String[]{"Missing request body!"});
+//        }
+//        Auth3Request enquiry = objectMapper.convertValue(getEnquiry(req), Auth3Request.class);
+//
+//        if (StringUtils.isBlank(enquiry.getOtp())) {
+//            return apiErrorUtils.getError("706", new String[]{"#userName"});
+//        }
+//        if (StringUtils.isBlank(enquiry.getSessionId())) {
+//            return apiErrorUtils.getError("706", new String[]{"#password"});
+//        }
+//        if (StringUtils.isBlank(enquiry.getUsername())) {
+//            return apiErrorUtils.getError("706", new String[]{"#password"});
+//        }
+//        if (StringUtils.isBlank(enquiry.getTransId())) {
+//            return apiErrorUtils.getError("706", new String[]{"#password"});
+//        }
+//        if (StringUtils.isBlank(enquiry.getTransTime())) {
+//            return apiErrorUtils.getError("706", new String[]{"#password"});
+//        }
+//        return new ApiError(ApiError.OK_CODE, ApiError.OK_DESC);
+        return ServiceUltil.validate(req, Auth3Request.class, apiErrorUtils, "ENQUIRY", Auth3Validation.class);
     }
 
     @KaiMethod(name = "confirmOTP")
@@ -92,11 +95,13 @@ public class ConfirmOTPService extends BaseService {
             ApiError apiError = apiErrorUtils.getError("503", new String[]{});
             return takeRespose(auth3Response, apiError);
         }
+
         //Neu OTP khong ton tai tra ve loi
         if (otp == null) {
             ApiError apiError = apiErrorUtils.getError("506", new String[]{""});
             return takeRespose(auth3Response, apiError);
         }
+
         //Check xem ma OTP co dung khong
         if (!enquiry.getOtp().toString().equals(otp.getValidate_code())) {
             //Neu khong dung thi tra ve loi sai otp
@@ -104,6 +109,7 @@ public class ConfirmOTPService extends BaseService {
             return takeRespose(auth3Response, apiError);
         }
         log.info("Start Time: {}", otp.getStart_time());
+
         //Check time out cua ma OTP
         if (checkTimeOut(otp.getEnd_time())) {
             ApiError apiError = apiErrorUtils.getError("998", new String[]{"OTP expired!"});
