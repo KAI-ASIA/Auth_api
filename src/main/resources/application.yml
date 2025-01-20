@@ -30,6 +30,7 @@ kai:
     code506: "The data does not exist in the database"
 
   time2live: 30 #minutes
+  expireTime: 2 #minutes
 spring:
   application:
     name: AUTH_API

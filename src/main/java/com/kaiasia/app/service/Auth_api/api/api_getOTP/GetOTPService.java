@@ -3,23 +3,34 @@ package com.kaiasia.app.service.Auth_api.api.api_getOTP;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
+import com.kaiasia.app.core.job.BaseService;
+import com.kaiasia.app.core.job.Enquiry;
 import com.kaiasia.app.core.utils.ApiConstant;
 import com.kaiasia.app.core.utils.GetErrorUtils;
 import com.kaiasia.app.register.KaiMethod;
 import com.kaiasia.app.register.KaiService;
 import com.kaiasia.app.register.Register;
 import com.kaiasia.app.service.Auth_api.dao.IAuthOTPDao;
+import com.kaiasia.app.service.Auth_api.dao.SessionIdDAO;
 import com.kaiasia.app.service.Auth_api.dto.GetOTPResponse;
 import com.kaiasia.app.service.Auth_api.kafka.resetpwd.KafkaUtils;
 import com.kaiasia.app.service.Auth_api.model.Auth2InsertDb;
 import com.kaiasia.app.service.Auth_api.model.Auth2Request;
+import com.kaiasia.app.service.Auth_api.model.AuthSessionResponse;
+import com.kaiasia.app.service.Auth_api.utils.AuthTakeSession;
 import com.kaiasia.app.service.Auth_api.utils.ResetPwdUtils;
+import com.kaiasia.app.service.Auth_api.utils.StatusOTPEnum;
 import lombok.extern.slf4j.Slf4j;
 import ms.apiclient.model.ApiBody;
 import ms.apiclient.model.ApiError;
 import ms.apiclient.model.ApiRequest;
 import ms.apiclient.model.ApiResponse;
+import ms.apiclient.t24util.T24Request;
+import ms.apiclient.t24util.T24UserInfoResponse;
+import ms.apiclient.t24util.T24UtilClient;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -28,7 +39,7 @@ import java.util.HashMap;
 
 @KaiService
 @Slf4j
-public class GetOTPService {
+public class GetOTPService extends BaseService {
 
     @Autowired
     GetErrorUtils apiErrorUtils;
@@ -47,39 +58,45 @@ public class GetOTPService {
     @Autowired
     private KafkaUtils kafkaUtils;
 
+    @Autowired
+    private T24UtilClient t24UtilClient;
+
+    @Autowired
+    private SessionIdDAO sessionIdDAO;
+
+    @Autowired
+    private AuthTakeSession authTakeSession;
+
+    @Value("${kai.expireTime}")
+    private int expireTime;
+
     @KaiMethod(name = "getOTP", type = Register.VALIDATE)
     public ApiError validate(ApiRequest req) {
 
-        ApiBody apiBody = req.getBody();
-        Object value = apiBody.get("enquiry");
-        HashMap enquiry = (HashMap) apiBody.get("enquiry");
-        if (enquiry == null) {
-            return apiErrorUtils.getError("804", new String[]{"Missing enquiry part!"});
-        }
-        String sessionId = (String) enquiry.get("sessionId");
-        String username = (String) enquiry.get("username");
-        String gmail = (String) enquiry.get("gmail");
-        String transTime = (String) enquiry.get("transTime");
-        String transId = (String) enquiry.get("transId");
+        Auth2Request enquiry = objectMapper.convertValue(getEnquiry(req), Auth2Request.class);
 
-        if (sessionId == null || sessionId.trim().isEmpty()) {
+        if (StringUtils.isBlank(enquiry.getSessionId())) {
             return apiErrorUtils.getError("706", new String[]{"sessionId"});
         }
 
-        if (username == null || username.trim().isEmpty()) {
+        if (StringUtils.isBlank(enquiry.getUsername())) {
             return apiErrorUtils.getError("706", new String[]{"username"});
         }
 
-        if (gmail == null || gmail.trim().isEmpty()) {
+        if (StringUtils.isBlank(enquiry.getGmail())) {
             return apiErrorUtils.getError("706", new String[]{"gmail"});
         }
 
-        if (transTime == null || transTime.trim().isEmpty()) {
+        if (StringUtils.isBlank(enquiry.getTransTime())) {
             return apiErrorUtils.getError("706", new String[]{"transTime"});
         }
 
-        if (transId == null || transId.trim().isEmpty()) {
+        if (StringUtils.isBlank(enquiry.getTransId())) {
             return apiErrorUtils.getError("706", new String[]{"transId"});
+        }
+
+        if (StringUtils.isBlank(enquiry.getTransInfo())) {
+            return apiErrorUtils.getError("706", new String[]{"transDesc"});
         }
 
 
@@ -87,70 +104,85 @@ public class GetOTPService {
     }
 
     @KaiMethod(name = "getOTP")
-    public ApiResponse process(ApiRequest req) {
-        HashMap enquiry = (HashMap) req.getBody().get("enquiry");
-        Long a = System.currentTimeMillis();
-        String LOCATION = "GetOTP" + enquiry.get("sessionId");
-
-        log.info(LOCATION + "#BEGIN");
+    public ApiResponse process(ApiRequest req) throws Exception {
+        long a = System.currentTimeMillis();
+        Enquiry enquiry = objectMapper.convertValue(getEnquiry(req), Enquiry.class);
 
         ApiResponse apiResponse = new ApiResponse();
 
-        Auth2Request auth2Request = objectMapper.convertValue(enquiry,Auth2Request.class);
+        Auth2Request auth2Request = objectMapper.convertValue(enquiry, Auth2Request.class);
 
-        try {
+        String LOCATION = "GetOTP" + enquiry.getSessionId() + "_" + System.currentTimeMillis();
 
-
-            String generateOTP = resetPwdUtils.generateValidateCode();
-
-            Auth2InsertDb auth2InsertDb = Auth2InsertDb.builder()
-                    .transId(auth2Request.getTransId())
-                    .validateCode(generateOTP)
-                    .username(auth2Request.getUsername())
-                    .sessionId("158963500-20161118132811-1479450491947")
-                    .channel(req.getHeader().getChannel())
-                    .location(req.getHeader().getLocation())
-                    .startTime(Timestamp.valueOf(LocalDateTime.now()))
-                    .endTime(Timestamp.valueOf(LocalDateTime.now().plusMinutes(2)))
-                    .status(auth2Request.getSmsParams().getTempId() + "_CONFIRM")
-                    .transTime("20161108122000")
-                    .transInfo(auth2Request.getTransInfo())
-                    .confirmTime(Timestamp.valueOf(LocalDateTime.now()))
-                    .build();
-
-            int result = authOTPService.insertOTP(auth2InsertDb);
-
-            if(result == 0){
-                ApiError apiError = apiErrorUtils.getError("800");
-                apiResponse.setError(apiError);
-                log.info(LOCATION + "#END#Duration:" + (System.currentTimeMillis() - a));
-                return apiResponse;
-            }
-
-            boolean isOTPValid = authOTPService.compareOTPAndCheckExpiration(enquiry);
-
-            if (!isOTPValid) {
-                ApiError apiError = apiErrorUtils.getError("605", new String[]{"Wrong OTP!"});
-                apiResponse.setError(apiError);
-                log.info(LOCATION + "#END#Duration:" + (System.currentTimeMillis() - a));
-                return apiResponse;
-            }
-
-            log.info("SEND TO KAFKA");
-            kafkaUtils.sendMessage("hoang@gmail.com",generateOTP);
-
-            GetOTPResponse response = new GetOTPResponse();
-            response.setResponseCode("00");
-            response.setTransId(enquiry.get("transId").toString());
-            ApiBody apiBody = new ApiBody();
-            apiBody.put(ApiConstant.COMMAND.ENQUIRY, response);
-            apiResponse.setBody(apiBody);
-
-        } catch (Exception e) {
-            log.error("{}:{}",LOCATION,e.getMessage());
-            ApiError apiError = apiErrorUtils.getError(ApiConstant.ErrorCode.INTERNAL_SERVER_ERROR, new String[] {e.getMessage()});
+        ApiResponse checkSessionID = authTakeSession.callTakeSessionAPI(enquiry.getSessionId());
+        if (checkSessionID.getError() != null){
+            ApiError apiError = apiErrorUtils.getError("801", new String[]{enquiry.getSessionId()});
+            log.info(LOCATION + "#END#Duration:" + (System.currentTimeMillis() - a));
             apiResponse.setError(apiError);
+            return apiResponse;
+
         }
+
+        log.info(LOCATION + "#BEGIN CALL USER INFO");
+        T24UserInfoResponse t24UserInfoResponse = t24UtilClient.getUserInfo(
+                LOCATION,
+                T24Request
+                        .builder()
+                        .username(auth2Request.getUsername())
+                        .build(),
+                req.getHeader()
+        );
+
+        if (t24UserInfoResponse.getError() != null){
+            ApiError apiError = new ApiError(t24UserInfoResponse.getError().getCode(), t24UserInfoResponse.getError().getDesc());
+            apiResponse.setError(apiError);
+            log.info(LOCATION + "#END CALL USER INFO" + (System.currentTimeMillis() - a));
+            return apiResponse;
+        }
+
+        if (t24UserInfoResponse.getEmail() == null && t24UserInfoResponse.getEmail().isEmpty()){
+            ApiError apiError = new ApiError(t24UserInfoResponse.getError().getCode(), t24UserInfoResponse.getError().getDesc());
+            apiResponse.setError(apiError);
+            log.info(LOCATION + "#EMAIL DOES NOT EXIST");
+            return apiResponse;
+        }
+
+
+        String generateOTP = resetPwdUtils.generateValidateCode();
+
+        Auth2InsertDb auth2InsertDb = Auth2InsertDb.builder()
+                .transId(auth2Request.getTransId())
+                .validateCode(generateOTP)
+                .username(auth2Request.getUsername())
+                .sessionId(auth2Request.getSessionId())
+                .channel(req.getHeader().getChannel())
+                .location(req.getHeader().getLocation())
+                .startTime(Timestamp.valueOf(LocalDateTime.now()))
+                .endTime(Timestamp.valueOf(LocalDateTime.now().plusMinutes(expireTime)))
+                .status(auth2Request.getSmsParams().getTempId() +"_" + StatusOTPEnum.CONFIRM)
+                .transTime(auth2Request.getTransTime())
+                .transInfo(auth2Request.getTransInfo())
+                .confirmTime(Timestamp.valueOf(LocalDateTime.now()))
+                .build();
+
+        int result = authOTPService.insertOTP(auth2InsertDb);
+
+        if (result == 0) {
+            log.info("INSERT FAIL" + LOCATION);
+        }else {
+            log.info("INSERT SUCCESSFULLY" + LOCATION);
+        }
+
+        log.info("SEND TO KAFKA");
+        kafkaUtils.sendMessage(t24UserInfoResponse.getEmail(), generateOTP);
+
+        GetOTPResponse response = new GetOTPResponse();
+        response.setResponseCode("00");
+        response.setTransId(auth2Request.getTransId());
+        ApiBody apiBody = new ApiBody();
+        apiBody.put(ApiConstant.COMMAND.ENQUIRY, response);
+        apiResponse.setBody(apiBody);
+
         log.info(LOCATION + "#END#Duration:" + (System.currentTimeMillis() - a));
         return apiResponse;
 
