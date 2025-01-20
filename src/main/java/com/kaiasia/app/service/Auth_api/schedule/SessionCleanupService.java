@@ -15,7 +15,7 @@ public class SessionCleanupService {
     @Autowired
     private SessionIdDAO sessionIdDAO;
 
-    @Scheduled(cron = "0 0/10 * * * ?")  // 10 xóa 1 lần
+    @Scheduled(cron = "0 0/100 * * * ?")  // 10 xóa 1 lần
     public void deleteExpiredSession() {
         System.out.println("hello");
         try {

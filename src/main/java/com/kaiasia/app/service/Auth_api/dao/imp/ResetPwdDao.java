@@ -1,18 +1,20 @@
 package com.kaiasia.app.service.Auth_api.dao.imp;
 
+import com.kaiasia.app.core.dao.CommonDAO;
 import com.kaiasia.app.core.dao.PosgrestDAOHelper;
 import com.kaiasia.app.service.Auth_api.dao.IResetPwdDao;
 import com.kaiasia.app.service.Auth_api.model.Auth5InsertDb;
+import com.kaiasia.app.service.Auth_api.model.Auth6ResFromDb;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 
 
-@Service
 @Slf4j
-public class ResetPwdDao implements IResetPwdDao {
+public class ResetPwdDao extends CommonDAO implements IResetPwdDao {
 
     @Autowired
     private PosgrestDAOHelper posgrestDAOHelper;
@@ -20,13 +22,7 @@ public class ResetPwdDao implements IResetPwdDao {
     @Override
     public int insertResetPwdRecord(Auth5InsertDb fields) {
 
-        if (fields == null || fields.getTransId() == null || fields.getValidateCode() == null
-                || fields.getChannel() == null || fields.getSessionId() == null) {
-            log.info("Missing required fields for insertion" + this.getClass().getName());
-            throw new IllegalArgumentException("Missing required fields for insertion");
-        }
-
-        String sql = "INSERT INTO auth_api.otp (trans_id, validate_code, username, channel, location, session_id, "
+        String sql = "INSERT INTO "+this.getTableName()+" (trans_id, validate_code, username, channel, location, session_id, "
                 + "start_time, end_time, confirm_time, trans_info, trans_time) "
                 + "VALUES (:trans_id, :validate_code, :username, :channel, :location, :session_id, "
                 + ":start_time, :end_time, :confirm_time, :trans_info, :trans_time)";
@@ -50,10 +46,28 @@ public class ResetPwdDao implements IResetPwdDao {
             log.info("insert to db with trans_id: {}-{}",fields.getTransId(),System.currentTimeMillis());
             result = posgrestDAOHelper.update(sql,param);
         }catch (Exception e) {
-            log.info("Error inserting OTP record with trans_id: {}-{}", fields.getTransId(),e);
-            throw new RuntimeException("Error inserting OTP record", e);
+            log.info("Error inserting record with trans_id: {} ERROR :{}", fields.getTransId(),e.getMessage());
+            throw new RuntimeException("Error inserting record", e);
         }
 
         return result;
+    }
+
+    @Override
+    public Auth6ResFromDb getResetPwdRecord(String username) {
+        StringBuilder sql = new StringBuilder("SELECT validate_code FROM ").append(this.getTableName()).append(" WHERE username = :username");
+
+        HashMap<String , Object> param = new HashMap<>();
+        param.put("username",username);
+
+        Auth6ResFromDb auth6ResFromDb ;
+        try {
+            auth6ResFromDb = posgrestDAOHelper.querySingle(sql.toString(),param, new BeanPropertyRowMapper<>(Auth6ResFromDb.class));
+        } catch (Exception e) {
+            log.info("Error get record with username: {} ERROR :{}", username,e);
+            throw new RuntimeException("Error while get record", e);
+        }
+
+        return auth6ResFromDb;
     }
 }

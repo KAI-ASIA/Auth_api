@@ -92,7 +92,12 @@ public class LoginService  extends BaseService{
         t24Req.setPassword(enquiry.getPassword());
 
         T24LoginResponse loginResponse =  t24UtilClient.login(LOCATION, t24Req, ApiUtils.buildApiHeader(req.getHeader()));
+        if(loginResponse.getError() != null){
+            ApiError apiError = new ApiError(loginResponse.getError().getCode(),loginResponse.getError().getDesc());
+            apiResponse.setError(apiError);
+            return apiResponse;
 
+        }
 
         // tạo sessionId
 

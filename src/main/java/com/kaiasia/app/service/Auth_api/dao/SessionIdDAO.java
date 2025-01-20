@@ -28,7 +28,7 @@ public class SessionIdDAO extends CommonDAO implements IAuthSessionDao{
     @Override
     public int insertSessionId(AuthSessionRequest authSessionRequest) throws Exception{
         String sql = "INSERT INTO \n" + this.getTableName() +
-                "(username, start_time, end_time, session_id, channel, \"location\", phone, email, company_code, customer_id)\n" +
+                "(username, start_time, end_time, session_id, channel, location, phone, email, company_code, customer_id)\n" +
                 "VALUES(:USERNAME, :START_TIME, :END_TIME,:SESSION_ID, :CHANNEL, :LOCATION,:PHONE, :EMAIL, :COMPANY_CODE, :CUSTOMER_ID);";
         HashMap<String, Object> param = new HashMap();
         param.put("USERNAME", authSessionRequest.getUsername());

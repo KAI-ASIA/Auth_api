@@ -12,7 +12,7 @@ kai:
     code998: "Timeout {0}"
     code701: "API not exist"
     code700: "API key not exists"
-    code804: "Request lacks valid information"
+    code804: "Request lacks valid information: {0}"
     code803: "RequestId not exist"
     code996: "Error insert request to DB#{0}"
     code703: "Enquiry not exist"
@@ -24,7 +24,11 @@ kai:
     code802: "Error retrieving sessionId: {0}"
     code810: "Session {0} has expired"
     code601: "Input OTP is invalid"
+    code505: "Failed to update database"
+    code504: "reset code not match"
     code503: "Failed to read from the database"
+    code506: "The data does not exist in the database"
+
   time2live: 30 #minutes
   expireTime: 2 #minutes
 spring:
@@ -57,7 +61,7 @@ dbinfo:
   apiRequest: request_in
   apiResponse: request_out
   authSession: auth_session
-#  authOTP: otp
+  otp: otp
 
 dep-api:
   t24utilsApi:
@@ -90,6 +94,8 @@ kafka_resetpwd:
     content: "Mã thay đổi mật khẩu của bạn là :{0}"
   topic:
     name : "resetpwd"
+  timeout: 5
+
 
 
 kafka_getOTP:

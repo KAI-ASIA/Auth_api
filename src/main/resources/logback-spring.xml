@@ -32,7 +32,6 @@
 		<appender-ref ref="CONSOLE" />
 	</logger>
 
-
 	<logger name="com.zaxxer.hikari" level="debug">
 		<appender-ref ref="KAI" />
 		<appender-ref ref="CONSOLE" />

@@ -1,6 +1,0 @@
-08-01-2025 16:06:41.243 INFO  --- com.kaiasia.app.AppApplication           - Starting AppApplication using Java 1.8.0_421 on Trinh with PID 20504 (E:\web\KAI-TTS\KAI-TTS\Fw\DemoApi\target\classes started by vinh5 in E:\web\KAI-TTS\KAI-TTS\Fw\DemoApi)
-08-01-2025 16:06:41.251 DEBUG --- com.kaiasia.app.AppApplication           - Running with Spring Boot v2.7.2, Spring v5.3.22
-08-01-2025 16:06:41.252 INFO  --- com.kaiasia.app.AppApplication           - No active profile set, falling back to 1 default profile: "default"
-08-01-2025 16:07:17.453 INFO  --- com.kaiasia.app.AppApplication           - Starting AppApplication using Java 1.8.0_421 on Trinh with PID 22800 (E:\web\KAI-TTS\KAI-TTS\Fw\DemoApi\target\classes started by vinh5 in E:\web\KAI-TTS\KAI-TTS\Fw\DemoApi)
-08-01-2025 16:07:17.455 DEBUG --- com.kaiasia.app.AppApplication           - Running with Spring Boot v2.7.2, Spring v5.3.22
-08-01-2025 16:07:17.456 INFO  --- com.kaiasia.app.AppApplication           - No active profile set, falling back to 1 default profile: "default"

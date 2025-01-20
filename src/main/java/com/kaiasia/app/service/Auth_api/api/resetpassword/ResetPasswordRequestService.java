@@ -12,17 +12,14 @@ import com.kaiasia.app.service.Auth_api.model.Auth5InsertDb;
 import com.kaiasia.app.service.Auth_api.model.Auth5Request;
 import com.kaiasia.app.service.Auth_api.utils.ResetPwdUtils;
 import lombok.extern.slf4j.Slf4j;
-import ms.apiclient.authen.AuthRequest;
-import ms.apiclient.authen.AuthTakeSessionResponse;
-import ms.apiclient.authen.AuthenClient;
 import ms.apiclient.model.*;
-import ms.apiclient.t24util.T24CustomerInfoResponse;
 import ms.apiclient.t24util.T24Request;
 import ms.apiclient.t24util.T24UserInfoResponse;
 import ms.apiclient.t24util.T24UtilClient;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -41,9 +38,6 @@ public class ResetPasswordRequestService {
     private T24UtilClient t24UtilClient;
 
     @Autowired
-    private  AuthenClient authenClient;
-
-    @Autowired
     private IResetPwdDao ResetPwdDao;
 
     @Autowired
@@ -52,32 +46,30 @@ public class ResetPasswordRequestService {
     @Autowired
     private KafkaUtils kafkaUtils;
 
+    @Value("${kafka_resetpwd.timeout}")
+    private int timeOut;
+
 
 
     @KaiMethod(name = "resetPassword" , type = Register.VALIDATE)
     public ApiError validate(ApiRequest req) throws Exception {
-
-        HashMap enquiry = (HashMap) req.getBody().get("enquiry");
         String channel = req.getHeader().getChannel();
-        String username = (String) enquiry.get("username");
-        String transId = (String) enquiry.get("transId");
+
+        Auth5Request auth5Request = objectMapper.convertValue(req.getBody().get("enquiry"),Auth5Request.class);
+
         long time = System.currentTimeMillis();
-        String location = channel +"-"+ username +"-"+ transId +"-"+ time;
+        String location = channel +"-"+ auth5Request.getUsername() +"-"+ auth5Request.getTransId() +"-"+ time;
 
         if (req.getBody() == null) {
             log.info("#BODY NULL" + location);
             return apiErrorUtils.getError("804", new String[]{"Missing request body!"});
         }
-        if (enquiry == null) {
-            log.info("#ENQUIRY NULL" + location);
-            return apiErrorUtils.getError("804", new String[]{"Missing enquiry part!"});
-        }
 
-        if(StringUtils.isBlank(username)){
+        if(StringUtils.isBlank(auth5Request.getUsername())){
             log.info("#FIELD NAME NULL" + location);
             return apiErrorUtils.getError("804", new String[]{"Missing field name !"});
         }
-        if(StringUtils.isBlank(transId)){
+        if(StringUtils.isBlank(auth5Request.getTransId())){
             log.info("#FIELD TRANSID NULL" + location);
             return apiErrorUtils.getError("804", new String[]{"Missing field transId !"});
         }
@@ -91,8 +83,8 @@ public class ResetPasswordRequestService {
         ApiBody body = new ApiBody();
         ApiHeader header = req.getHeader();
         apiResponse.setHeader(header);
-        Object enquiry = req.getBody().get("enquiry");
-        Auth5Request auth5Request = objectMapper.convertValue(enquiry,Auth5Request.class);
+
+        Auth5Request auth5Request = objectMapper.convertValue(req.getBody().get("enquiry"),Auth5Request.class);
 
         String chanel = header.getChannel();
         long time = System.currentTimeMillis();
@@ -103,65 +95,63 @@ public class ResetPasswordRequestService {
                 location,
                 T24Request
                         .builder()
-//                            .username(authTakeSessionResponse.getUsername())
                         .username(auth5Request.getUsername())
                         .build(),
                 req.getHeader()
         );
 
-        if(t24UserInfoResponse.getError() != null){
-            ApiError apiError = new ApiError(t24UserInfoResponse.getError().getCode(),t24UserInfoResponse.getError().getDesc());
-            apiResponse.setError(apiError);
+        if(t24UserInfoResponse.getError() != null && !ApiError.OK_CODE.equals(t24UserInfoResponse.getError().getCode())){
             log.info(location + "#END CALL USER INFO" + (System.currentTimeMillis() - time));
+            apiResponse.setError(t24UserInfoResponse.getError());
             return apiResponse;
         }
 
-        if(t24UserInfoResponse.getCustomerId() == null && t24UserInfoResponse.getCustomerId().isEmpty()){
+        if(StringUtils.isBlank(t24UserInfoResponse.getCustomerId()) && t24UserInfoResponse.getCustomerId().isEmpty()){
             ApiError apiError = new ApiError(t24UserInfoResponse.getError().getCode(),t24UserInfoResponse.getError().getDesc());
             apiResponse.setError(apiError);
             log.info(location + "#ID DOES NOT EXIST" + (System.currentTimeMillis() - time));
             return apiResponse;
         }
 
-        // thiếu check user có bị khóa không ?
+        // check user họoạt động
+        if(!"ACTIVE".equals(t24UserInfoResponse.getUserStatus())){
+            ApiError apiError = new ApiError(t24UserInfoResponse.getError().getCode(),t24UserInfoResponse.getError().getDesc());
+            apiResponse.setError(apiError);
+            log.info(location + "#USER INACTIVE" + (System.currentTimeMillis() - time));
+            return apiResponse;
+        }
 
         //check email
-        if(t24UserInfoResponse.getEmail() == null && t24UserInfoResponse.getEmail().isEmpty() ){
+        if(StringUtils.isBlank(t24UserInfoResponse.getEmail()) && t24UserInfoResponse.getEmail().isEmpty() ){
             ApiError apiError = new ApiError(t24UserInfoResponse.getError().getCode(),t24UserInfoResponse.getError().getDesc());
             apiResponse.setError(apiError);
             log.info(location + "#EMAIL DOES NOT EXIST");
             return apiResponse;
         }
 
-//        AuthTakeSessionResponse authTakeSessionResponse = authenClient.takeSession(
-//                    location,
-//                    AuthRequest
-//                            .builder()
-////                            .sessionId(eBankReq.getSessionId())
-//                            .sessionId("158963500-20170110135803-1484031483542")
-//                            .build(),
-//                    req.getHeader()
-//            );
-
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime expirationTime = now.plusMinutes(5);
+        LocalDateTime expirationTime = now.plusMinutes(timeOut);
         String resetCode = resetPwdUtils.generateValidateCode();
-
-
-        // cần take session để insert vào db
 
         Auth5InsertDb auth5InsertDb = Auth5InsertDb.builder()
                 .transId(auth5Request.getTransId())
                 .validateCode(resetCode)
                 .username(t24UserInfoResponse.getCustomerId())
-                .sessionId("158963500-20170110135803-1484031483542")
+                .sessionId(resetPwdUtils.generateTempSession())
                 .channel(header.getChannel())
                 .startTime(now)
                 .endTime(expirationTime)
                 .build();
 
-
-        int insert = ResetPwdDao.insertResetPwdRecord(auth5InsertDb);
+        int insert = 0 ;
+        try{
+            insert = ResetPwdDao.insertResetPwdRecord(auth5InsertDb);
+        }catch (Exception e){
+            log.info("Unexpected error at location: {}. Error: {}",location,e.getMessage());
+            ApiError apiError = new ApiError(t24UserInfoResponse.getError().getCode(),t24UserInfoResponse.getError().getDesc());
+            apiResponse.setError(apiError);
+            return apiResponse;
+        }
 
         if(insert == 0 ){
             log.info("INSERT FAIL" + location);
@@ -170,7 +160,7 @@ public class ResetPasswordRequestService {
         }
 
 
-        log.info("SEND TO KAFKA");
+        log.info(location + "#SEND TO KAFKA");
         kafkaUtils.sendMessage(t24UserInfoResponse.getEmail(),resetCode);
 
 
