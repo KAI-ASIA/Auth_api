@@ -9,7 +9,5 @@ public interface IAuthOTPDao {
     OTP getOTP(String sessionId, String username, String transId ) throws Exception;
     void setConfirmTime( Timestamp now, OTP otp) throws Exception;
 
-    boolean compareOTPAndCheckExpiration(HashMap<String, String> body) throws Exception;
-
     int insertOTP(Auth2InsertDb auth2InsertDb) throws Exception;
 }
