@@ -1,7 +1,7 @@
-package com.kaiasia.app.service.Auth_api.kafka.resetpwd;
+package com.kaiasia.app.service.Auth_api.kafka.changepassword;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,14 +11,13 @@ import org.springframework.stereotype.Component;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Component
-public class EmailMessage {
+public class EmailMessage1 {
 
     private String email;
-    @Value("${kafka_changepassword.subject}")
+
     private String subject;
-    @Value("${kafka_changepassword.content}")
+
     private String content;
-    @Value("${kafka_changepassword.notiKey}")
+
     private String notiKey;
 }

@@ -1,7 +1,8 @@
-package com.kaiasia.app.service.Auth_api.kafka.resetpwd;
+package com.kaiasia.app.service.Auth_api.kafka.changepassword;
 
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.aspectj.bridge.IMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -13,12 +14,9 @@ import java.text.MessageFormat;
 
 
 @Component
-public class KafkaUtils {
+public class KafkaUtils1 {
     @Autowired
     private KafkaTemplate<String, Object> kafkaTemplate;
-
-    @Value("${kafka_resetpwd.topic.name}")
-    private String topic;
 
     @Value("${kafka_resetpwd.email.content}")
     private String content;
@@ -35,14 +33,15 @@ public class KafkaUtils {
     @Value("${kafka_changepassword.subject}")
     private String subjectchangepassword;
 
-    public void sendMessage(String email, String resetCode) {
-        EmailMessage message = new EmailMessage();
-        String formattedContent = MessageFormat.format(content, resetCode);
-        message.setContent(formattedContent);
-        message.setSubject(subject);
-        message.setEmail(email);
-        kafkaTemplate.send(topic, message);
+    @Value("${kafka_changepassword.notiKey}")
+    private String notiKeychangepassword;
+    public void sendMessage1(String EmailMessage1) {
+        EmailMessage1 message = new EmailMessage1();
+        message.setContent(content);
+        message.setSubject(subjectchangepassword);
+        message.setEmail(EmailMessage1);
+        message.setNotiKey(notiKeychangepassword);
+        kafkaTemplate.send(topicchangepassword, message);
     }
-
 
 }
