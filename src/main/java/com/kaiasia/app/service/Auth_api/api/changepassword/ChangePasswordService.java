@@ -10,9 +10,7 @@ import com.kaiasia.app.register.Register;
 
 import com.kaiasia.app.service.Auth_api.dao.SessionIdDAO;
 
-import com.kaiasia.app.service.Auth_api.kafka.changepassword.EmailMessage1;
-import com.kaiasia.app.service.Auth_api.kafka.changepassword.KafkaUtils1;
-import com.kaiasia.app.service.Auth_api.kafka.resetpwd.KafkaUtils;
+import com.kaiasia.app.service.Auth_api.kafka.changepassword.KafkaUtilsChangePassword;
 import com.kaiasia.app.service.Auth_api.model.Auth4Request;
 import com.kaiasia.app.service.Auth_api.model.AuthSessionResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +43,7 @@ public class ChangePasswordService extends BaseService {
     private SessionIdDAO sessionIdDAO;
 
     @Autowired
-    private KafkaUtils1 kafkaUtils1;
+    private KafkaUtilsChangePassword kafkaUtils1;
 
     @KaiMethod(name = "changePassword", type = Register.VALIDATE)
     public ApiError validate(ApiRequest req) {

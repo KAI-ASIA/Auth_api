@@ -15,10 +15,10 @@ import org.springframework.stereotype.Component;
 public class EmailMessage {
 
     private String email;
-    @Value("${kafka_changepassword.subject}")
+
     private String subject;
-    @Value("${kafka_changepassword.content}")
+
     private String content;
-    @Value("${kafka_changepassword.notiKey}")
+
     private String notiKey;
 }
