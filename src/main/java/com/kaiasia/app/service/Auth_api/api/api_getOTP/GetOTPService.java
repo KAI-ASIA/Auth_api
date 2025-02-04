@@ -13,10 +13,9 @@ import com.kaiasia.app.register.Register;
 import com.kaiasia.app.service.Auth_api.dao.IAuthOTPDao;
 import com.kaiasia.app.service.Auth_api.dao.SessionIdDAO;
 import com.kaiasia.app.service.Auth_api.dto.GetOTPResponse;
-import com.kaiasia.app.service.Auth_api.kafka.resetpwd.KafkaUtils;
+import com.kaiasia.app.service.Auth_api.kafka.getOTP.KafkaUtilsForGetOTP;
 import com.kaiasia.app.service.Auth_api.model.Auth2InsertDb;
 import com.kaiasia.app.service.Auth_api.model.Auth2Request;
-import com.kaiasia.app.service.Auth_api.model.AuthSessionResponse;
 import com.kaiasia.app.service.Auth_api.utils.AuthTakeSession;
 import com.kaiasia.app.service.Auth_api.utils.ResetPwdUtils;
 import com.kaiasia.app.service.Auth_api.utils.StatusOTPEnum;
@@ -34,7 +33,6 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 
 
 @KaiService
@@ -56,7 +54,7 @@ public class GetOTPService extends BaseService {
     private ResetPwdUtils resetPwdUtils;
 
     @Autowired
-    private KafkaUtils kafkaUtils;
+    private KafkaUtilsForGetOTP kafkaUtils;
 
     @Autowired
     private T24UtilClient t24UtilClient;
