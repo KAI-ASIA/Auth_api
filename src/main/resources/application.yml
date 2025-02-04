@@ -104,3 +104,13 @@ kafka_getOTP:
     content: "Ma OTP cua ban la {0}. Co thoi gian 2 phut"
   topic:
     name : "getOTP"
+
+
+
+kafka_changepassword:
+  email:
+    notiKey: "CHANGE_PASS_NOTIFY"
+    subject: "Doi mat khau thanh cong"
+    content: "Mat khau cua quy khach da duoc doi thanh cong. Vui long dang nhap lai ung dung"
+  topic:
+    name : "changepassword"
