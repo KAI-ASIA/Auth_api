@@ -101,7 +101,9 @@ kafka_resetpwd:
 kafka_getOTP:
   email:
     subject: "Giao dich chuyen tien"
-    content: "Ma OTP cua ban la {0}. Co thoi gian 2 phut"
+    content: "Ma OTP cua ban la {0}. Co thoi gian 2 phut.
+              KHONG gui ma xac thuc cho bat ky ai bao gom NHAN VIEN NGAN HANG 
+              de tranh rui ro. LH: 190000888888."
   topic:
     name : "getOTP"
 

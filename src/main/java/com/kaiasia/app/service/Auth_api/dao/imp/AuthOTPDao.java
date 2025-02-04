@@ -54,7 +54,7 @@ public class AuthOTPDao extends CommonDAO implements IAuthOTPDao {
 
     @Override
     public int insertOTP(Auth2InsertDb auth2InsertDb) throws Exception {
-        String sql = "INSERT INTO auth_api.otp\n" +
+        String sql = "INSERT INTO " + this.getTableName() +
                 "(validate_code, trans_id, username, channel, start_time, location, end_time, status, session_id, confirm_time, trans_info, trans_time)\n" +
                 "VALUES(:validate_code, :trans_id, :username,:channel, :start_time, :location,:end_time, :status, :session_id, :confirm_time, :trans_info, :trans_time);";
         HashMap<String, Object> param = new HashMap<>();
