@@ -14,20 +14,21 @@ public class KafkaUtilsChangePassword {
     @Autowired
     private KafkaTemplate<String, Object> kafkaTemplate;
 
-    @Value("${kafka_resetpwd.topic.name}")
+    @Value("${kafka_changePassword.topic.name}")
     private String topic;
 
-    @Value("${kafka_resetpwd.email.content}")
+    @Value("${kafka_changePassword.email.content}")
     private String content;
 
-    @Value("${kafka_resetpwd.email.subject}")
+    @Value("${kafka_changePassword.email.subject}")
     private String subject;
 
-    @Value("${kafka_resetpwd.email.notiKey}")
+    @Value("${kafka_changePassword.email.notiKey}")
     private String notiKey;
-    public void sendMessage1(String email) {
+    public void sendMessage(String email, String resetCode) {
         EmailMessage message = new EmailMessage();
-        message.setContent(content);
+        String formattedContent = MessageFormat.format(content, resetCode);
+        message.setContent(formattedContent);
         message.setSubject(subject);
         message.setEmail(email);
         message.setNotiKey(notiKey);

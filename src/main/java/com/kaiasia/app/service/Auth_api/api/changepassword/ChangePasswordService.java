@@ -13,6 +13,7 @@ import com.kaiasia.app.service.Auth_api.dao.SessionIdDAO;
 import com.kaiasia.app.service.Auth_api.kafka.changepassword.KafkaUtilsChangePassword;
 import com.kaiasia.app.service.Auth_api.model.Auth4Request;
 import com.kaiasia.app.service.Auth_api.model.AuthSessionResponse;
+import com.kaiasia.app.service.Auth_api.utils.ResetPwdUtils;
 import lombok.extern.slf4j.Slf4j;
 import ms.apiclient.model.*;
 import ms.apiclient.t24util.T24ChangePasswordResponse;
@@ -43,8 +44,10 @@ public class ChangePasswordService extends BaseService {
     private SessionIdDAO sessionIdDAO;
 
     @Autowired
-    private KafkaUtilsChangePassword kafkaUtils1;
+    private KafkaUtilsChangePassword kafkaUtilsChangePassword;
 
+    @Autowired
+    private ResetPwdUtils resetPwdUtils;
     @KaiMethod(name = "changePassword", type = Register.VALIDATE)
     public ApiError validate(ApiRequest req) {
         Auth4Request auth4Request = objectMapper.convertValue(getEnquiry(req), Auth4Request.class);
@@ -120,9 +123,9 @@ public class ChangePasswordService extends BaseService {
                             .build(),
                     req.getHeader()
             );
-
+        String resetCode = resetPwdUtils.generateValidateCode();
         log.info(location + "#SEND TO KAFKA");
-        kafkaUtils1.sendMessage1(t24UserInfoResponse.getEmail());
+        kafkaUtilsChangePassword.sendMessage(t24UserInfoResponse.getEmail(), resetCode);
 
         HashMap<String , Object> field = new HashMap<>();
         field.put("responseCode","00");
