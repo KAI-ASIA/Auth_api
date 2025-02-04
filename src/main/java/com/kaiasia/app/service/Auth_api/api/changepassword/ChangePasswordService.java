@@ -14,6 +14,7 @@ import com.kaiasia.app.service.Auth_api.kafka.changepassword.KafkaUtilsChangePas
 import com.kaiasia.app.service.Auth_api.model.Auth4Request;
 import com.kaiasia.app.service.Auth_api.model.AuthSessionResponse;
 import com.kaiasia.app.service.Auth_api.utils.ResetPwdUtils;
+
 import lombok.extern.slf4j.Slf4j;
 import ms.apiclient.model.*;
 import ms.apiclient.t24util.T24ChangePasswordResponse;
@@ -74,6 +75,7 @@ public class ChangePasswordService extends BaseService {
         }
         return new ApiError(ApiError.OK_CODE, ApiError.OK_DESC);
     }
+
     @KaiMethod(name = "changePassword")
     public ApiResponse process(ApiRequest req) {
         ApiResponse apiResponse = new ApiResponse();
@@ -114,6 +116,7 @@ public class ChangePasswordService extends BaseService {
                 log.error(location + "#SESSION EXPIRED");
                 return apiResponse;
             }
+            // 3. call api doi mk
             log.info(location + "#BEGIN CALL CHANGE PASSWORD");
             T24ChangePasswordResponse t24ChangePasswordResponse = t24UtilClient.changePassword(
                     location,
@@ -123,6 +126,19 @@ public class ChangePasswordService extends BaseService {
                             .build(),
                     req.getHeader()
             );
+        // 4. Nếu đổi mật khẩu thành công -> expire session
+        log.info(location + "#PASSWORD CHANGED SUCCESSFULLY");
+
+        // Hết hạn session sau khi đổi mật khẩu thành công
+        log.info(location + "#EXPIRE SESSION AFTER PASSWORD CHANGE: " + auth4Request.getSessionId());
+        int expireResult = sessionIdDAO.expireSessionImmediately(auth4Request.getSessionId());
+
+        if (expireResult > 0) {
+            log.info(location + "#SESSION EXPIRED SUCCESSFULLY: " + auth4Request.getSessionId());
+        } else {
+            log.warn(location + "#FAILED TO EXPIRE SESSION: " + auth4Request.getSessionId() + " (Session might not exist)");
+        }
+        // 5. Gửi email xác nhận qua Kafka
         String resetCode = resetPwdUtils.generateValidateCode();
         log.info(location + "#SEND TO KAFKA");
         kafkaUtilsChangePassword.sendMessage(t24UserInfoResponse.getEmail(), resetCode);

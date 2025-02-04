@@ -17,4 +17,5 @@ public interface IAuthSessionDao {
     int deleteSessionByCustomerId(String customerId) throws  Exception;
 
 
+    int expireSessionImmediately(String sessionId);
 }
