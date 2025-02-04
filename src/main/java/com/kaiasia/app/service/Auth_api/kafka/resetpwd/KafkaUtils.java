@@ -26,6 +26,14 @@ public class KafkaUtils {
     @Value("${kafka_resetpwd.email.subject}")
     private String subject;
 
+    @Value("${kafka_changepassword.topic.name}")
+    private String topicchangepassword;
+
+    @Value("${kafka_changepassword.email.content}")
+    private String contentchangepassword;
+
+    @Value("${kafka_changepassword.email.subject}")
+    private String subjectchangepassword;
 
     public void sendMessage(String email, String resetCode) {
         EmailMessage message = new EmailMessage();
@@ -35,4 +43,13 @@ public class KafkaUtils {
         message.setEmail(email);
         kafkaTemplate.send(topic, message);
     }
+    public void sendMessage1(String email, String resetCode) {
+        EmailMessage message = new EmailMessage();
+        String formattedContent = MessageFormat.format(contentchangepassword, resetCode);
+        message.setContent(formattedContent);
+        message.setSubject(subjectchangepassword);
+        message.setEmail(email);
+        kafkaTemplate.send(topicchangepassword, message);
+    }
+
 }
