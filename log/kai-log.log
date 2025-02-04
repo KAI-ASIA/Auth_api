@@ -1,6 +1,179 @@
-28-01-2025 15:29:45.553 INFO  --- com.kaiasia.app.AppApplication           - Starting AppApplication using Java 17.0.9 on MSI with PID 22452 (D:\Visual studio\Project\target\classes started by LT MSI in D:\Visual studio\Project)
-28-01-2025 15:29:45.555 DEBUG --- com.kaiasia.app.AppApplication           - Running with Spring Boot v2.7.2, Spring v5.3.22
-28-01-2025 15:29:45.557 INFO  --- com.kaiasia.app.AppApplication           - No active profile set, falling back to 1 default profile: "default"
-28-01-2025 15:30:02.307 INFO  --- com.kaiasia.app.AppApplication           - Starting AppApplication using Java 17.0.9 on MSI with PID 2832 (D:\Visual studio\Project\target\classes started by LT MSI in D:\Visual studio\Project)
-28-01-2025 15:30:02.309 DEBUG --- com.kaiasia.app.AppApplication           - Running with Spring Boot v2.7.2, Spring v5.3.22
-28-01-2025 15:30:02.310 INFO  --- com.kaiasia.app.AppApplication           - No active profile set, falling back to 1 default profile: "default"
+04-02-2025 20:16:13.140 INFO  --- com.kaiasia.app.AppApplication           - Starting AppApplication using Java 17.0.9 on MSI with PID 16816 (D:\Visual studio\Project\target\classes started by LT MSI in D:\Visual studio\Project)
+04-02-2025 20:16:13.143 DEBUG --- com.kaiasia.app.AppApplication           - Running with Spring Boot v2.7.2, Spring v5.3.22
+04-02-2025 20:16:13.143 INFO  --- com.kaiasia.app.AppApplication           - No active profile set, falling back to 1 default profile: "default"
+04-02-2025 20:16:14.197 DEBUG --- com.zaxxer.hikari.HikariConfig           - Driver class org.postgresql.Driver found in Thread context class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1d44bcfa
+04-02-2025 20:16:14.204 DEBUG --- com.zaxxer.hikari.HikariConfig           - Driver class org.postgresql.Driver found in Thread context class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1d44bcfa
+04-02-2025 20:16:14.516 DEBUG --- com.zaxxer.hikari.HikariConfig           - HikariPool-1 - configuration:
+04-02-2025 20:16:14.518 DEBUG --- com.zaxxer.hikari.HikariConfig           - allowPoolSuspension................................false
+04-02-2025 20:16:14.518 DEBUG --- com.zaxxer.hikari.HikariConfig           - autoCommit................................true
+04-02-2025 20:16:14.518 DEBUG --- com.zaxxer.hikari.HikariConfig           - catalog................................none
+04-02-2025 20:16:14.518 DEBUG --- com.zaxxer.hikari.HikariConfig           - connectionInitSql................................none
+04-02-2025 20:16:14.518 DEBUG --- com.zaxxer.hikari.HikariConfig           - connectionTestQuery................................none
+04-02-2025 20:16:14.518 DEBUG --- com.zaxxer.hikari.HikariConfig           - connectionTimeout................................30000
+04-02-2025 20:16:14.518 DEBUG --- com.zaxxer.hikari.HikariConfig           - dataSource................................none
+04-02-2025 20:16:14.519 DEBUG --- com.zaxxer.hikari.HikariConfig           - dataSourceClassName................................none
+04-02-2025 20:16:14.519 DEBUG --- com.zaxxer.hikari.HikariConfig           - dataSourceJNDI................................none
+04-02-2025 20:16:14.520 DEBUG --- com.zaxxer.hikari.HikariConfig           - dataSourceProperties................................{password=<masked>}
+04-02-2025 20:16:14.520 DEBUG --- com.zaxxer.hikari.HikariConfig           - driverClassName................................"org.postgresql.Driver"
+04-02-2025 20:16:14.520 DEBUG --- com.zaxxer.hikari.HikariConfig           - exceptionOverrideClassName................................none
+04-02-2025 20:16:14.520 DEBUG --- com.zaxxer.hikari.HikariConfig           - healthCheckProperties................................{}
+04-02-2025 20:16:14.520 DEBUG --- com.zaxxer.hikari.HikariConfig           - healthCheckRegistry................................none
+04-02-2025 20:16:14.520 DEBUG --- com.zaxxer.hikari.HikariConfig           - idleTimeout................................120000
+04-02-2025 20:16:14.520 DEBUG --- com.zaxxer.hikari.HikariConfig           - initializationFailTimeout................................1
+04-02-2025 20:16:14.520 DEBUG --- com.zaxxer.hikari.HikariConfig           - isolateInternalQueries................................false
+04-02-2025 20:16:14.520 DEBUG --- com.zaxxer.hikari.HikariConfig           - jdbcUrl................................jdbc:postgresql://14.225.254.212:5432/KAI_API?currentSchema=auth_api
+04-02-2025 20:16:14.520 DEBUG --- com.zaxxer.hikari.HikariConfig           - keepaliveTime................................0
+04-02-2025 20:16:14.520 DEBUG --- com.zaxxer.hikari.HikariConfig           - leakDetectionThreshold................................0
+04-02-2025 20:16:14.521 DEBUG --- com.zaxxer.hikari.HikariConfig           - maxLifetime................................1800000
+04-02-2025 20:16:14.521 DEBUG --- com.zaxxer.hikari.HikariConfig           - maximumPoolSize................................50
+04-02-2025 20:16:14.521 DEBUG --- com.zaxxer.hikari.HikariConfig           - metricRegistry................................none
+04-02-2025 20:16:14.521 DEBUG --- com.zaxxer.hikari.HikariConfig           - metricsTrackerFactory................................none
+04-02-2025 20:16:14.521 DEBUG --- com.zaxxer.hikari.HikariConfig           - minimumIdle................................10
+04-02-2025 20:16:14.521 DEBUG --- com.zaxxer.hikari.HikariConfig           - password................................<masked>
+04-02-2025 20:16:14.521 DEBUG --- com.zaxxer.hikari.HikariConfig           - poolName................................"HikariPool-1"
+04-02-2025 20:16:14.521 DEBUG --- com.zaxxer.hikari.HikariConfig           - readOnly................................false
+04-02-2025 20:16:14.522 DEBUG --- com.zaxxer.hikari.HikariConfig           - registerMbeans................................false
+04-02-2025 20:16:14.522 DEBUG --- com.zaxxer.hikari.HikariConfig           - scheduledExecutor................................none
+04-02-2025 20:16:14.522 DEBUG --- com.zaxxer.hikari.HikariConfig           - schema................................none
+04-02-2025 20:16:14.522 DEBUG --- com.zaxxer.hikari.HikariConfig           - threadFactory................................internal
+04-02-2025 20:16:14.522 DEBUG --- com.zaxxer.hikari.HikariConfig           - transactionIsolation................................default
+04-02-2025 20:16:14.523 DEBUG --- com.zaxxer.hikari.HikariConfig           - username................................"auth_api"
+04-02-2025 20:16:14.523 DEBUG --- com.zaxxer.hikari.HikariConfig           - validationTimeout................................5000
+04-02-2025 20:16:14.523 INFO  --- com.zaxxer.hikari.HikariDataSource       - HikariPool-1 - Starting...
+04-02-2025 20:16:15.175 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@8851ec
+04-02-2025 20:16:15.176 INFO  --- com.zaxxer.hikari.HikariDataSource       - HikariPool-1 - Start completed.
+04-02-2025 20:16:15.281 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Before cleanup stats (total=1, active=0, idle=1, waiting=0)
+04-02-2025 20:16:15.281 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - After cleanup  stats (total=1, active=0, idle=1, waiting=0)
+04-02-2025 20:16:15.574 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@1a827041
+04-02-2025 20:16:15.773 DEBUG --- com.kaiasia.app.register.ServiceRegister - Found 6 classes with annotation SeabService
+04-02-2025 20:16:15.873 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@5f80fd75
+04-02-2025 20:16:16.187 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@3efcb916
+04-02-2025 20:16:16.377 INFO  --- com.kaiasia.app.AppApplication           - Started AppApplication in 3.589 seconds (JVM running for 4.712)
+04-02-2025 20:16:16.483 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7a05469e
+04-02-2025 20:16:16.779 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7c98aa5f
+04-02-2025 20:16:17.118 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@3be1d924
+04-02-2025 20:16:17.410 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@608ee347
+04-02-2025 20:16:17.723 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@306f687e
+04-02-2025 20:16:18.041 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@99ce67e
+04-02-2025 20:16:18.042 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - After adding stats (total=10, active=0, idle=10, waiting=0)
+04-02-2025 20:16:34.582 INFO  --- com.kaiasia.app.core.MainRestController  - MsgFromClient_Receive:ApiRequest(header=ApiHeader(reqType=REQUEST, api=AUTH_API, apiKey=authq51klfoni1ezxl5f2ckpfx248, channel=API, location=PC/IOS, requestAPI=FE API, requestNode=node 01, duration=null, priority=1, context=null, synasyn=false), body={command=GET_ENQUIRY, enquiry={authenType=confirmOTP, sessionId=158963500-20161118132811-1479450491947, username=158963500, otp=986325, transTime=20161108122000, transId=AUTHEN-confirmOTP-45122211}, status=OK}, _reqId=null, _rejectCounter=null, _sendTime=null, _command=null, _authenType=null, _timeOut=null)
+04-02-2025 20:16:34.593 DEBUG --- com.kaiasia.app.register.ServiceRegister - Execute method validate for AuthenType: VALIDATE_confirmOTP
+04-02-2025 20:16:34.793 INFO  --- com.kaiasia.app.ValidateImpl             - 000 OK
+04-02-2025 20:16:34.793 INFO  --- com.kaiasia.app.core.MainRestController  - 1738674994793000_0000_dc3ad127dee247a898af0786cb19cf66#[API-BEGIN]
+04-02-2025 20:16:34.813 INFO  --- com.kaiasia.app.core.dao.APIDaoManager   - InsertAPIReqs()1738674994793000_0000_dc3ad127dee247a898af0786cb19cf66#BEGIN
+04-02-2025 20:16:35.057 INFO  --- com.kaiasia.app.core.dao.APIDaoManager   - InsertAPIReqs()1738674994793000_0000_dc3ad127dee247a898af0786cb19cf66#END
+04-02-2025 20:16:35.086 INFO  --- com.kaiasia.app.core.ProcessService      - 1738674994793000_0000_dc3ad127dee247a898af0786cb19cf66##pushApiReqToQueue#Duration:291
+04-02-2025 20:16:35.622 INFO  --- com.kaiasia.app.core.MainRestController  - 1738674994793000_0000_dc3ad127dee247a898af0786cb19cf66##END
+04-02-2025 20:16:35.623 INFO  --- com.kaiasia.app.core.MainRestController  - 1738674994793000_0000_dc3ad127dee247a898af0786cb19cf66#MsgFromClient_Response:ApiResponse(header=ApiHeader(reqType=RESPONSE, api=AUTH_API, apiKey=authq51klfoni1ezxl5f2ckpfx248, channel=API, location=PC/IOS, requestAPI=FE API, requestNode=node 01, duration=-38202846, priority=1, context=null, synasyn=false), body={enquiry={responseCode=00, transId=AUTHEN-confirmOTP-45122211}, status=OK}, error=null)#Total time: 1041
+04-02-2025 20:16:45.288 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Before cleanup stats (total=10, active=0, idle=10, waiting=0)
+04-02-2025 20:16:45.290 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - After cleanup  stats (total=10, active=0, idle=10, waiting=0)
+04-02-2025 20:16:45.290 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Fill pool skipped, pool is at sufficient level.
+04-02-2025 20:17:15.301 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Before cleanup stats (total=10, active=1, idle=9, waiting=0)
+04-02-2025 20:17:15.302 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - After cleanup  stats (total=10, active=1, idle=9, waiting=0)
+04-02-2025 20:17:15.665 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@20fd15dd
+04-02-2025 20:17:15.666 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - After adding stats (total=11, active=1, idle=10, waiting=0)
+04-02-2025 20:17:36.656 INFO  --- com.kaiasia.app.core.MainRestController  - MsgFromClient_Receive:ApiRequest(header=ApiHeader(reqType=REQUEST, api=AUTH_API, apiKey=authq51klfoni1ezxl5f2ckpfx248, channel=API, location=PC/IOS, requestAPI=FE API, requestNode=node 01, duration=null, priority=1, context=null, synasyn=false), body={command=GET_ENQUIRY, enquiry={authenType=confirmOTP, sessionId=158963500-20161118132811-1479450491947, username=158963500, otp=986325, transTime=20161108122000, transId=AUTHEN-confirmOTP-45122211}, status=OK}, _reqId=null, _rejectCounter=null, _sendTime=null, _command=null, _authenType=null, _timeOut=null)
+04-02-2025 20:17:36.658 DEBUG --- com.kaiasia.app.register.ServiceRegister - Execute method validate for AuthenType: VALIDATE_confirmOTP
+04-02-2025 20:17:36.659 INFO  --- com.kaiasia.app.ValidateImpl             - 000 OK
+04-02-2025 20:17:36.659 INFO  --- com.kaiasia.app.core.MainRestController  - 1738675056659000_0000_5e53ef18650a4cdbad03c94bcdfde594#[API-BEGIN]
+04-02-2025 20:17:36.686 INFO  --- com.kaiasia.app.core.dao.APIDaoManager   - InsertAPIReqs()1738675056659000_0000_5e53ef18650a4cdbad03c94bcdfde594#BEGIN
+04-02-2025 20:17:36.925 INFO  --- com.kaiasia.app.core.dao.APIDaoManager   - InsertAPIReqs()1738675056659000_0000_5e53ef18650a4cdbad03c94bcdfde594#END
+04-02-2025 20:17:36.951 INFO  --- com.kaiasia.app.core.ProcessService      - 1738675056659000_0000_5e53ef18650a4cdbad03c94bcdfde594##pushApiReqToQueue#Duration:291
+04-02-2025 20:17:37.448 INFO  --- com.kaiasia.app.core.MainRestController  - 1738675056659000_0000_5e53ef18650a4cdbad03c94bcdfde594##END
+04-02-2025 20:17:37.448 INFO  --- com.kaiasia.app.core.MainRestController  - 1738675056659000_0000_5e53ef18650a4cdbad03c94bcdfde594#MsgFromClient_Response:ApiResponse(header=ApiHeader(reqType=RESPONSE, api=AUTH_API, apiKey=authq51klfoni1ezxl5f2ckpfx248, channel=API, location=PC/IOS, requestAPI=FE API, requestNode=node 01, duration=-38197624, priority=1, context=null, synasyn=false), body={enquiry={responseCode=00, transId=AUTHEN-confirmOTP-45122211}, status=OK}, error=null)#Total time: 792
+04-02-2025 20:17:45.317 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Before cleanup stats (total=11, active=0, idle=11, waiting=0)
+04-02-2025 20:17:45.317 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - After cleanup  stats (total=11, active=0, idle=11, waiting=0)
+04-02-2025 20:17:45.317 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Fill pool skipped, pool is at sufficient level.
+04-02-2025 20:18:15.319 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Before cleanup stats (total=11, active=0, idle=11, waiting=0)
+04-02-2025 20:18:15.319 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - After cleanup  stats (total=11, active=0, idle=11, waiting=0)
+04-02-2025 20:18:15.319 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Fill pool skipped, pool is at sufficient level.
+04-02-2025 20:18:24.256 INFO  --- com.zaxxer.hikari.HikariDataSource       - HikariPool-1 - Shutdown initiated...
+04-02-2025 20:18:24.257 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Before shutdown stats (total=11, active=0, idle=11, waiting=0)
+04-02-2025 20:18:24.257 DEBUG --- com.zaxxer.hikari.pool.PoolBase          - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@8851ec: (connection evicted)
+04-02-2025 20:18:24.284 DEBUG --- com.zaxxer.hikari.pool.PoolBase          - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@1a827041: (connection evicted)
+04-02-2025 20:18:24.309 DEBUG --- com.zaxxer.hikari.pool.PoolBase          - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@5f80fd75: (connection evicted)
+04-02-2025 20:18:24.338 DEBUG --- com.zaxxer.hikari.pool.PoolBase          - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@3efcb916: (connection evicted)
+04-02-2025 20:18:24.365 DEBUG --- com.zaxxer.hikari.pool.PoolBase          - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@7a05469e: (connection evicted)
+04-02-2025 20:18:24.393 DEBUG --- com.zaxxer.hikari.pool.PoolBase          - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@7c98aa5f: (connection evicted)
+04-02-2025 20:18:24.420 DEBUG --- com.zaxxer.hikari.pool.PoolBase          - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@3be1d924: (connection evicted)
+04-02-2025 20:18:24.447 DEBUG --- com.zaxxer.hikari.pool.PoolBase          - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@608ee347: (connection evicted)
+04-02-2025 20:18:24.475 DEBUG --- com.zaxxer.hikari.pool.PoolBase          - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@306f687e: (connection evicted)
+04-02-2025 20:18:24.502 DEBUG --- com.zaxxer.hikari.pool.PoolBase          - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@99ce67e: (connection evicted)
+04-02-2025 20:18:24.530 DEBUG --- com.zaxxer.hikari.pool.PoolBase          - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@20fd15dd: (connection evicted)
+04-02-2025 20:18:24.564 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - After shutdown stats (total=0, active=0, idle=0, waiting=0)
+04-02-2025 20:18:24.564 INFO  --- com.zaxxer.hikari.HikariDataSource       - HikariPool-1 - Shutdown completed.
+04-02-2025 20:18:27.009 INFO  --- com.kaiasia.app.AppApplication           - Starting AppApplication using Java 17.0.9 on MSI with PID 21932 (D:\Visual studio\Project\target\classes started by LT MSI in D:\Visual studio\Project)
+04-02-2025 20:18:27.010 DEBUG --- com.kaiasia.app.AppApplication           - Running with Spring Boot v2.7.2, Spring v5.3.22
+04-02-2025 20:18:27.010 INFO  --- com.kaiasia.app.AppApplication           - No active profile set, falling back to 1 default profile: "default"
+04-02-2025 20:18:27.778 DEBUG --- com.zaxxer.hikari.HikariConfig           - Driver class org.postgresql.Driver found in Thread context class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1d44bcfa
+04-02-2025 20:18:27.785 DEBUG --- com.zaxxer.hikari.HikariConfig           - Driver class org.postgresql.Driver found in Thread context class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1d44bcfa
+04-02-2025 20:18:28.003 DEBUG --- com.zaxxer.hikari.HikariConfig           - HikariPool-1 - configuration:
+04-02-2025 20:18:28.005 DEBUG --- com.zaxxer.hikari.HikariConfig           - allowPoolSuspension................................false
+04-02-2025 20:18:28.005 DEBUG --- com.zaxxer.hikari.HikariConfig           - autoCommit................................true
+04-02-2025 20:18:28.005 DEBUG --- com.zaxxer.hikari.HikariConfig           - catalog................................none
+04-02-2025 20:18:28.005 DEBUG --- com.zaxxer.hikari.HikariConfig           - connectionInitSql................................none
+04-02-2025 20:18:28.005 DEBUG --- com.zaxxer.hikari.HikariConfig           - connectionTestQuery................................none
+04-02-2025 20:18:28.005 DEBUG --- com.zaxxer.hikari.HikariConfig           - connectionTimeout................................30000
+04-02-2025 20:18:28.005 DEBUG --- com.zaxxer.hikari.HikariConfig           - dataSource................................none
+04-02-2025 20:18:28.005 DEBUG --- com.zaxxer.hikari.HikariConfig           - dataSourceClassName................................none
+04-02-2025 20:18:28.005 DEBUG --- com.zaxxer.hikari.HikariConfig           - dataSourceJNDI................................none
+04-02-2025 20:18:28.006 DEBUG --- com.zaxxer.hikari.HikariConfig           - dataSourceProperties................................{password=<masked>}
+04-02-2025 20:18:28.006 DEBUG --- com.zaxxer.hikari.HikariConfig           - driverClassName................................"org.postgresql.Driver"
+04-02-2025 20:18:28.006 DEBUG --- com.zaxxer.hikari.HikariConfig           - exceptionOverrideClassName................................none
+04-02-2025 20:18:28.007 DEBUG --- com.zaxxer.hikari.HikariConfig           - healthCheckProperties................................{}
+04-02-2025 20:18:28.007 DEBUG --- com.zaxxer.hikari.HikariConfig           - healthCheckRegistry................................none
+04-02-2025 20:18:28.007 DEBUG --- com.zaxxer.hikari.HikariConfig           - idleTimeout................................120000
+04-02-2025 20:18:28.007 DEBUG --- com.zaxxer.hikari.HikariConfig           - initializationFailTimeout................................1
+04-02-2025 20:18:28.007 DEBUG --- com.zaxxer.hikari.HikariConfig           - isolateInternalQueries................................false
+04-02-2025 20:18:28.007 DEBUG --- com.zaxxer.hikari.HikariConfig           - jdbcUrl................................jdbc:postgresql://14.225.254.212:5432/KAI_API?currentSchema=auth_api
+04-02-2025 20:18:28.007 DEBUG --- com.zaxxer.hikari.HikariConfig           - keepaliveTime................................0
+04-02-2025 20:18:28.007 DEBUG --- com.zaxxer.hikari.HikariConfig           - leakDetectionThreshold................................0
+04-02-2025 20:18:28.007 DEBUG --- com.zaxxer.hikari.HikariConfig           - maxLifetime................................1800000
+04-02-2025 20:18:28.007 DEBUG --- com.zaxxer.hikari.HikariConfig           - maximumPoolSize................................50
+04-02-2025 20:18:28.007 DEBUG --- com.zaxxer.hikari.HikariConfig           - metricRegistry................................none
+04-02-2025 20:18:28.007 DEBUG --- com.zaxxer.hikari.HikariConfig           - metricsTrackerFactory................................none
+04-02-2025 20:18:28.007 DEBUG --- com.zaxxer.hikari.HikariConfig           - minimumIdle................................10
+04-02-2025 20:18:28.007 DEBUG --- com.zaxxer.hikari.HikariConfig           - password................................<masked>
+04-02-2025 20:18:28.007 DEBUG --- com.zaxxer.hikari.HikariConfig           - poolName................................"HikariPool-1"
+04-02-2025 20:18:28.007 DEBUG --- com.zaxxer.hikari.HikariConfig           - readOnly................................false
+04-02-2025 20:18:28.008 DEBUG --- com.zaxxer.hikari.HikariConfig           - registerMbeans................................false
+04-02-2025 20:18:28.008 DEBUG --- com.zaxxer.hikari.HikariConfig           - scheduledExecutor................................none
+04-02-2025 20:18:28.008 DEBUG --- com.zaxxer.hikari.HikariConfig           - schema................................none
+04-02-2025 20:18:28.008 DEBUG --- com.zaxxer.hikari.HikariConfig           - threadFactory................................internal
+04-02-2025 20:18:28.008 DEBUG --- com.zaxxer.hikari.HikariConfig           - transactionIsolation................................default
+04-02-2025 20:18:28.009 DEBUG --- com.zaxxer.hikari.HikariConfig           - username................................"auth_api"
+04-02-2025 20:18:28.010 DEBUG --- com.zaxxer.hikari.HikariConfig           - validationTimeout................................5000
+04-02-2025 20:18:28.010 INFO  --- com.zaxxer.hikari.HikariDataSource       - HikariPool-1 - Starting...
+04-02-2025 20:18:28.606 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@37d3aa8c
+04-02-2025 20:18:28.608 INFO  --- com.zaxxer.hikari.HikariDataSource       - HikariPool-1 - Start completed.
+04-02-2025 20:18:28.720 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Before cleanup stats (total=1, active=0, idle=1, waiting=0)
+04-02-2025 20:18:28.721 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - After cleanup  stats (total=1, active=0, idle=1, waiting=0)
+04-02-2025 20:18:29.008 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@4d21308
+04-02-2025 20:18:29.151 DEBUG --- com.kaiasia.app.register.ServiceRegister - Found 6 classes with annotation SeabService
+04-02-2025 20:18:29.295 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@41d09df6
+04-02-2025 20:18:29.587 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@1b81162e
+04-02-2025 20:18:29.697 INFO  --- com.kaiasia.app.AppApplication           - Started AppApplication in 2.944 seconds (JVM running for 3.278)
+04-02-2025 20:18:29.889 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@30ac7897
+04-02-2025 20:18:30.198 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7f01f00c
+04-02-2025 20:18:30.492 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@25b1bfff
+04-02-2025 20:18:30.788 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@3692ed01
+04-02-2025 20:18:31.083 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@65a94384
+04-02-2025 20:18:31.369 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@15585ead
+04-02-2025 20:18:31.369 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - After adding stats (total=10, active=0, idle=10, waiting=0)
+04-02-2025 20:18:58.736 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Before cleanup stats (total=10, active=0, idle=10, waiting=0)
+04-02-2025 20:18:58.738 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - After cleanup  stats (total=10, active=0, idle=10, waiting=0)
+04-02-2025 20:18:58.738 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Fill pool skipped, pool is at sufficient level.
+04-02-2025 20:19:06.777 INFO  --- com.zaxxer.hikari.HikariDataSource       - HikariPool-1 - Shutdown initiated...
+04-02-2025 20:19:06.777 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - Before shutdown stats (total=10, active=0, idle=10, waiting=0)
+04-02-2025 20:19:06.780 DEBUG --- com.zaxxer.hikari.pool.PoolBase          - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@37d3aa8c: (connection evicted)
+04-02-2025 20:19:06.806 DEBUG --- com.zaxxer.hikari.pool.PoolBase          - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@4d21308: (connection evicted)
+04-02-2025 20:19:06.834 DEBUG --- com.zaxxer.hikari.pool.PoolBase          - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@41d09df6: (connection evicted)
+04-02-2025 20:19:06.861 DEBUG --- com.zaxxer.hikari.pool.PoolBase          - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@1b81162e: (connection evicted)
+04-02-2025 20:19:06.888 DEBUG --- com.zaxxer.hikari.pool.PoolBase          - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@30ac7897: (connection evicted)
+04-02-2025 20:19:06.915 DEBUG --- com.zaxxer.hikari.pool.PoolBase          - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@7f01f00c: (connection evicted)
+04-02-2025 20:19:06.942 DEBUG --- com.zaxxer.hikari.pool.PoolBase          - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@25b1bfff: (connection evicted)
+04-02-2025 20:19:06.968 DEBUG --- com.zaxxer.hikari.pool.PoolBase          - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@3692ed01: (connection evicted)
+04-02-2025 20:19:06.995 DEBUG --- com.zaxxer.hikari.pool.PoolBase          - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@65a94384: (connection evicted)
+04-02-2025 20:19:07.022 DEBUG --- com.zaxxer.hikari.pool.PoolBase          - HikariPool-1 - Closing connection org.postgresql.jdbc.PgConnection@15585ead: (connection evicted)
+04-02-2025 20:19:07.049 DEBUG --- com.zaxxer.hikari.pool.HikariPool        - HikariPool-1 - After shutdown stats (total=0, active=0, idle=0, waiting=0)
+04-02-2025 20:19:07.050 INFO  --- com.zaxxer.hikari.HikariDataSource       - HikariPool-1 - Shutdown completed.
