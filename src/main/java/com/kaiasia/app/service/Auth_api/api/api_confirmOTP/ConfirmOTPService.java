@@ -45,27 +45,6 @@ public class ConfirmOTPService extends BaseService {
 
     @KaiMethod(name = "confirmOTP", type = Register.VALIDATE)
     public ApiError validate(ApiRequest req) {
-//        if (req.getBody() == null) {
-//            return apiErrorUtils.getError("804", new String[]{"Missing request body!"});
-//        }
-//        Auth3Request enquiry = objectMapper.convertValue(getEnquiry(req), Auth3Request.class);
-//
-//        if (StringUtils.isBlank(enquiry.getOtp())) {
-//            return apiErrorUtils.getError("706", new String[]{"#userName"});
-//        }
-//        if (StringUtils.isBlank(enquiry.getSessionId())) {
-//            return apiErrorUtils.getError("706", new String[]{"#password"});
-//        }
-//        if (StringUtils.isBlank(enquiry.getUsername())) {
-//            return apiErrorUtils.getError("706", new String[]{"#password"});
-//        }
-//        if (StringUtils.isBlank(enquiry.getTransId())) {
-//            return apiErrorUtils.getError("706", new String[]{"#password"});
-//        }
-//        if (StringUtils.isBlank(enquiry.getTransTime())) {
-//            return apiErrorUtils.getError("706", new String[]{"#password"});
-//        }
-//        return new ApiError(ApiError.OK_CODE, ApiError.OK_DESC);
         return ServiceUltil.validate(req, Auth3Request.class, apiErrorUtils, "ENQUIRY", Auth3Validation.class);
     }
 
