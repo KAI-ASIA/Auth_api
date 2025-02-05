@@ -10,12 +10,16 @@ import com.kaiasia.app.register.Register;
 
 import com.kaiasia.app.service.Auth_api.dao.SessionIdDAO;
 
+import com.kaiasia.app.service.Auth_api.kafka.changepassword.KafkaUtilsChangePassword;
 import com.kaiasia.app.service.Auth_api.model.Auth4Request;
 import com.kaiasia.app.service.Auth_api.model.AuthSessionResponse;
+import com.kaiasia.app.service.Auth_api.utils.ResetPwdUtils;
+
 import lombok.extern.slf4j.Slf4j;
 import ms.apiclient.model.*;
 import ms.apiclient.t24util.T24ChangePasswordResponse;
 import ms.apiclient.t24util.T24Request;
+import ms.apiclient.t24util.T24UserInfoResponse;
 import ms.apiclient.t24util.T24UtilClient;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +44,11 @@ public class ChangePasswordService extends BaseService {
     @Autowired
     private SessionIdDAO sessionIdDAO;
 
+    @Autowired
+    private KafkaUtilsChangePassword kafkaUtilsChangePassword;
+
+    @Autowired
+    private ResetPwdUtils resetPwdUtils;
     @KaiMethod(name = "changePassword", type = Register.VALIDATE)
     public ApiError validate(ApiRequest req) {
         Auth4Request auth4Request = objectMapper.convertValue(getEnquiry(req), Auth4Request.class);
@@ -66,30 +75,48 @@ public class ChangePasswordService extends BaseService {
         }
         return new ApiError(ApiError.OK_CODE, ApiError.OK_DESC);
     }
+
     @KaiMethod(name = "changePassword")
     public ApiResponse process(ApiRequest req) {
         ApiResponse apiResponse = new ApiResponse();
         ApiHeader header = req.getHeader();
         ApiBody body = new ApiBody();
         Auth4Request auth4Request = objectMapper.convertValue(getEnquiry(req), Auth4Request.class);
-        String location = "t" + auth4Request.getSessionId() + "_" + auth4Request.getTransId();
+        String location = "changePassword" + auth4Request.getSessionId() + "_" + auth4Request.getTransId();
+        T24UserInfoResponse t24UserInfoResponse =  t24UtilClient.getUserInfo(
+                location,
+                T24Request
+                        .builder()
+                        .username(auth4Request.getUsername())
+                        .build(),
+                req.getHeader()
+        );
         // 1. Check session (sessionId, username)
+
         log.info(location + "#CHECK SESSION");
         AuthSessionResponse authSessionResponse = new AuthSessionResponse();
         try {
             authSessionResponse = sessionIdDAO.getAuthSessionId(auth4Request.getSessionId());
         } catch (Exception e) {
+
         }
-            if (authSessionResponse.getSessionId() == null) {
+            if (authSessionResponse == null) {
+                ApiError apiError = apiErrorUtils.getError("801", new String[]{auth4Request.getSessionId()});
+                apiResponse.setError(apiError);
                 // Xử lý lỗi: Session không tồn tại hoặc không hợp lệ
                 log.error(location + "#SESSION NOT FOUND OR INVALID");
+                return  apiResponse;
             }
             // 2. Check session OK => check end time > systemdate
             log.info(location + "#CHECK SESSION TIME");
             if (authSessionResponse.getEndTime().before(new Date())) {
                 // Xử lý lỗi: Session đã hết hạn
+                ApiError apiError = apiErrorUtils.getError("810", new String[]{auth4Request.getSessionId()});
+                apiResponse.setError(apiError);
                 log.error(location + "#SESSION EXPIRED");
+                return apiResponse;
             }
+            // 3. call api doi mk
             log.info(location + "#BEGIN CALL CHANGE PASSWORD");
             T24ChangePasswordResponse t24ChangePasswordResponse = t24UtilClient.changePassword(
                     location,
@@ -99,6 +126,23 @@ public class ChangePasswordService extends BaseService {
                             .build(),
                     req.getHeader()
             );
+        // 4. Nếu đổi mật khẩu thành công -> expire session
+        log.info(location + "#PASSWORD CHANGED SUCCESSFULLY");
+
+        // Hết hạn session sau khi đổi mật khẩu thành công
+        log.info(location + "#EXPIRE SESSION AFTER PASSWORD CHANGE: " + auth4Request.getSessionId());
+        int expireResult = sessionIdDAO.expireSessionImmediately(auth4Request.getSessionId());
+
+        if (expireResult > 0) {
+            log.info(location + "#SESSION EXPIRED SUCCESSFULLY: " + auth4Request.getSessionId());
+        } else {
+            log.warn(location + "#FAILED TO EXPIRE SESSION: " + auth4Request.getSessionId() + " (Session might not exist)");
+        }
+        // 5. Gửi email xác nhận qua Kafka
+        String resetCode = resetPwdUtils.generateValidateCode();
+        log.info(location + "#SEND TO KAFKA");
+        kafkaUtilsChangePassword.sendMessage(t24UserInfoResponse.getEmail(), resetCode);
+
         HashMap<String , Object> field = new HashMap<>();
         field.put("responseCode","00");
         field.put("transId",auth4Request.getTransId());
