@@ -70,4 +70,20 @@ public class ResetPwdDao extends CommonDAO implements IResetPwdDao {
 
         return auth6ResFromDb;
     }
+
+    @Override
+    public Auth6ResFromDb getTimeExpire(String username) {
+        StringBuilder sql = new StringBuilder("SELECT end_time FROM ").append(this.getTableName()).append(" WHERE username = :username");
+        HashMap<String , Object> param = new HashMap<>();
+        param.put("username",username);
+
+        Auth6ResFromDb getEndTime ;
+        try {
+            getEndTime = posgrestDAOHelper.querySingle(sql.toString(),param, new BeanPropertyRowMapper<>(Auth6ResFromDb.class));
+        } catch (Exception e) {
+            log.info("Error get record with username: {} ERROR :{}", username,e);
+            throw new RuntimeException("Error while get record", e);
+        }
+        return getEndTime;
+    }
 }

@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 
 @KaiService
@@ -46,8 +48,8 @@ public class ResetPasswordRequestService {
     @Autowired
     private KafkaUtils kafkaUtils;
 
-    @Value("${kafka_resetpwd.timeout}")
-    private int timeOut;
+    @Value("${resetpwd.timeExpired}")
+    private long timeExpired;
 
 
 
@@ -129,20 +131,23 @@ public class ResetPasswordRequestService {
             return apiResponse;
         }
 
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime expirationTime = now.plusMinutes(timeOut);
+        ZoneId vietnamZone = ZoneId.of("Asia/Ho_Chi_Minh");
+        ZonedDateTime vietnamTime = ZonedDateTime.now(vietnamZone);
+        LocalDateTime now = vietnamTime.toLocalDateTime();
+        LocalDateTime expirationTime = now.plusSeconds(timeExpired);
         String resetCode = resetPwdUtils.generateValidateCode();
 
         Auth5InsertDb auth5InsertDb = Auth5InsertDb.builder()
                 .transId(auth5Request.getTransId())
                 .validateCode(resetCode)
-                .username(t24UserInfoResponse.getCustomerId())
+                .username(auth5Request.getUsername())
                 .sessionId(resetPwdUtils.generateTempSession())
                 .channel(header.getChannel())
                 .startTime(now)
                 .endTime(expirationTime)
                 .build();
 
+        System.out.println(auth5InsertDb.getUsername());
         int insert = 0 ;
         try{
             insert = ResetPwdDao.insertResetPwdRecord(auth5InsertDb);
@@ -158,7 +163,6 @@ public class ResetPasswordRequestService {
         }else {
             log.info("INSERT SUCCESFULLY" + location);
         }
-
 
         log.info(location + "#SEND TO KAFKA");
         kafkaUtils.sendMessage(t24UserInfoResponse.getEmail(),resetCode);
