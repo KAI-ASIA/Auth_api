@@ -18,6 +18,7 @@ import ms.apiclient.t24util.T24UtilClient;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 
 @KaiService
@@ -94,6 +95,13 @@ public class ResetPasswordConfirmService {
             return apiResponse;
         }
 
+//        if(t24UserInfoResponse.getCustomerId() == null && t24UserInfoResponse.getCustomerId().isEmpty()){
+//            ApiError apiError = new ApiError(t24UserInfoResponse.getError().getCode(),t24UserInfoResponse.getError().getDesc());
+//            apiResponse.setError(apiError);
+//            log.info(location + "#ID DOES NOT EXIST" + (System.currentTimeMillis() - time));
+//            return apiResponse;
+//        }
+
         if(!"ACTIVE".equals(t24UserInfoResponse.getUserStatus())){
             ApiError apiError = new ApiError(t24UserInfoResponse.getError().getCode(),t24UserInfoResponse.getError().getDesc());
             apiResponse.setError(apiError);
@@ -101,16 +109,9 @@ public class ResetPasswordConfirmService {
             return apiResponse;
         }
 
-        if(t24UserInfoResponse.getCustomerId() == null && t24UserInfoResponse.getCustomerId().isEmpty()){
-            ApiError apiError = new ApiError(t24UserInfoResponse.getError().getCode(),t24UserInfoResponse.getError().getDesc());
-            apiResponse.setError(apiError);
-            log.info(location + "#ID DOES NOT EXIST" + (System.currentTimeMillis() - time));
-            return apiResponse;
-        }
-
         Auth6ResFromDb auth6ResFromDb = null;
         try{
-            auth6ResFromDb = resetPwdDao.getResetPwdRecord(t24UserInfoResponse.getCustomerId());
+            auth6ResFromDb = resetPwdDao.getResetPwdRecord(auth6Request.getUsername());
         }catch (NullPointerException e){
             ApiError apiError = apiErrorUtils.getError("503");
             apiResponse.setError(apiError);
@@ -127,6 +128,17 @@ public class ResetPasswordConfirmService {
             ApiError apiError = apiErrorUtils.getError("504");
             apiResponse.setError(apiError);
             log.info(location + "#RESET CODE DOES NOT MATCH" + (System.currentTimeMillis() - time));
+            return apiResponse;
+        }
+
+        Auth6ResFromDb EndTime = resetPwdDao.getTimeExpire(auth6Request.getUsername());
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime timeExpiration = EndTime.getEndTime();
+
+        if(now.isAfter(timeExpiration)){
+            log.info(location + "#RESET CODE EXPIRED" + (System.currentTimeMillis() - time));
+            ApiError apiError = apiErrorUtils.getError("577");
+            apiResponse.setError(apiError);
             return apiResponse;
         }
 
