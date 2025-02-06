@@ -20,5 +20,11 @@ public class ResetPwdUtils {
         return  String.valueOf(r) ;
     }
 
+    public String generateTransID(){
+        Random random = new Random();
+        int tranId = 100000 + random.nextInt(900000);
+        return  String.valueOf(tranId) ;
+    }
+
 
 }
