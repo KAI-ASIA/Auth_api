@@ -104,17 +104,16 @@ public class GetOTPService extends BaseService {
     @KaiMethod(name = "getOTP")
     public ApiResponse process(ApiRequest req) throws Exception {
         long a = System.currentTimeMillis();
-        Enquiry enquiry = objectMapper.convertValue(getEnquiry(req), Enquiry.class);
 
         ApiResponse apiResponse = new ApiResponse();
 
-        Auth2Request auth2Request = objectMapper.convertValue(enquiry, Auth2Request.class);
+        Auth2Request auth2Request = objectMapper.convertValue(getEnquiry(req), Auth2Request.class);
 
-        String LOCATION = "GetOTP" + enquiry.getSessionId() + "_" + System.currentTimeMillis();
+        String LOCATION = "GetOTP" + auth2Request.getSessionId() + "_" + System.currentTimeMillis();
 
-        ApiResponse checkSessionID = authTakeSession.callTakeSessionAPI(enquiry.getSessionId());
+        ApiResponse checkSessionID = authTakeSession.callTakeSessionAPI(auth2Request.getSessionId());
         if (checkSessionID.getError() != null){
-            ApiError apiError = apiErrorUtils.getError("801", new String[]{enquiry.getSessionId()});
+            ApiError apiError = apiErrorUtils.getError("801", new String[]{auth2Request.getSessionId()});
             log.info(LOCATION + "#END#Duration:" + (System.currentTimeMillis() - a));
             apiResponse.setError(apiError);
             return apiResponse;
@@ -147,9 +146,10 @@ public class GetOTPService extends BaseService {
 
 
         String generateOTP = resetPwdUtils.generateValidateCode();
+        String generateTransID = auth2Request.getTransId() + "-" +auth2Request.getUsername() + resetPwdUtils.generateTransID();
 
         Auth2InsertDb auth2InsertDb = Auth2InsertDb.builder()
-                .transId(auth2Request.getTransId())
+                .transId(generateTransID)
                 .validateCode(generateOTP)
                 .username(auth2Request.getUsername())
                 .sessionId(auth2Request.getSessionId())
@@ -157,7 +157,7 @@ public class GetOTPService extends BaseService {
                 .location(req.getHeader().getLocation())
                 .startTime(Timestamp.valueOf(LocalDateTime.now()))
                 .endTime(Timestamp.valueOf(LocalDateTime.now().plusMinutes(expireTime)))
-                .status(auth2Request.getSmsParams().getTempId() +"_" + StatusOTPEnum.CONFIRM)
+                .status(String.valueOf(StatusOTPEnum.CONFIRM))
                 .transTime(auth2Request.getTransTime())
                 .transInfo(auth2Request.getTransInfo())
                 .confirmTime(Timestamp.valueOf(LocalDateTime.now()))
@@ -172,11 +172,11 @@ public class GetOTPService extends BaseService {
         }
 
         log.info("SEND TO KAFKA");
-        kafkaUtils.sendMessage(t24UserInfoResponse.getEmail(), generateOTP);
+        kafkaUtils.sendMessage(auth2Request.getGmail(), generateOTP);
 
         GetOTPResponse response = new GetOTPResponse();
         response.setResponseCode("00");
-        response.setTransId(auth2Request.getTransId());
+        response.setTransId(generateTransID);
         ApiBody apiBody = new ApiBody();
         apiBody.put(ApiConstant.COMMAND.ENQUIRY, response);
         apiResponse.setBody(apiBody);
