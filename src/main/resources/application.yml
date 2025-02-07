@@ -28,6 +28,7 @@ kai:
     code504: "reset code not match"
     code503: "Failed to read from the database"
     code506: "The data does not exist in the database"
+    code577: "reset code expired"
 
   time2live: 30 #minutes
   expireTime: 2 #minutes
@@ -88,13 +89,14 @@ kafka:
   authentication: false
   clientId: node01-localhost
 
-kafka_resetpwd:
-  email:
-    subject: "Thay đổi mật khẩu"
-    content: "Mã thay đổi mật khẩu của bạn là :{0}"
-  topic:
-    name : "resetpwd"
-  timeout: 5
+resetpwd:
+  kafka:
+    email:
+      subject: "Thay đổi mật khẩu"
+      content: "Mã thay đổi mật khẩu của bạn là :{0}"
+    topic:
+      name : "resetpwd"
+  timeExpired: 5
 
 
 
@@ -109,10 +111,10 @@ kafka_getOTP:
 
 
 
-kafka_changepassword:
+kafka_changePassword:
   email:
     notiKey: "CHANGE_PASS_NOTIFY"
     subject: "Doi mat khau thanh cong"
     content: "Mat khau cua quy khach da duoc doi thanh cong. Vui long dang nhap lai ung dung"
   topic:
-    name : "changepassword"
+    name : "changePassword"

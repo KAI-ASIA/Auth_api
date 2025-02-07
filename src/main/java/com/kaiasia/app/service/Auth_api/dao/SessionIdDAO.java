@@ -8,13 +8,10 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.stereotype.Component;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-
-import javax.transaction.Transactional;
 
 //@Component
 public class SessionIdDAO extends CommonDAO implements IAuthSessionDao{
@@ -132,6 +129,22 @@ public class SessionIdDAO extends CommonDAO implements IAuthSessionDao{
         int result = posgrestDAOHelper.update(sql, param);
         return result;
     }
+@Override
+public int expireSessionImmediately(String sessionId)  {
+    String sql = "UPDATE " + this.getTableName() + " SET end_time = NOW() WHERE session_id = :SESSION_ID";
 
+    HashMap<String, Object> param = new HashMap<>();
+    param.put("SESSION_ID", sessionId);
+
+    int result = 0;
+    try {
+        result = posgrestDAOHelper.update(sql, param);
+    } catch (Exception e) {
+        throw new RuntimeException(e);
+    }
+    log.info("Session " + sessionId + " has been expired immediately.");
+
+    return result;
+}
 
 }

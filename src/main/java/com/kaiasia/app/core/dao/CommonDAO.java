@@ -5,4 +5,6 @@ import lombok.Data;
 @Data
 public abstract class CommonDAO {
     private String tableName;
+
+
 }
