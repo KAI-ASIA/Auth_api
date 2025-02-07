@@ -87,39 +87,42 @@ public class LoginService  extends BaseService{
 
         ApiResponse apiResponse = new ApiResponse();
 
+        // Tạo yêu cầu đăng nhập vào hệ thống T24
         T24Request t24Req = new T24Request();
         t24Req.setUsername(enquiry.getUsername());
         t24Req.setPassword(enquiry.getPassword());
 
-        T24LoginResponse loginResponse =  t24UtilClient.login(LOCATION, t24Req, ApiUtils.buildApiHeader(req.getHeader()));
-        if(loginResponse.getError() != null){
+        T24LoginResponse loginResponse = t24UtilClient.login(LOCATION, t24Req, ApiUtils.buildApiHeader(req.getHeader()));
+
+        if(!loginResponse.getError().getCode().equals("000")){
             ApiError apiError = new ApiError(loginResponse.getError().getCode(),loginResponse.getError().getDesc());
             apiResponse.setError(apiError);
+            log.warn("{} #LOGIN_FAILED: {} - {}", LOCATION, loginResponse.getError().getCode(), loginResponse.getError().getDesc());
             return apiResponse;
 
         }
 
-        // tạo sessionId
 
+        // xử lý sessionId
        try {
-
            String customerId = loginResponse.getCustomerID();
+
+           // Xóa session cũ nếu tồn tại
            if(sessionIdDAO.deleteSessionByCustomerId(customerId) > 0 ){  // kiểm trả customerId co exist
 
-               log.info("Deleted  session for customer ID " + customerId);
+               log.info("{} #SESSION_DELETED for customer ID: {}", LOCATION, customerId);
 
            }
+           // Thiết lập thời gian session có hiệu lực (30 phút)
            Date startTime = new Date();
-           
-           //TODO check them time2live 30 minute
            Calendar cal = Calendar.getInstance();
            cal.setTime(startTime);
            cal.add(Calendar.MINUTE, time2livee);
            Date endTime = cal.getTime();
 
-
            String sessionID = sessionUtil.createCustomerSessionId(customerId);
 
+           // Lưu session vào cơ sở dữ liệu
            AuthSessionRequest sessionRequest = AuthSessionRequest.builder()
                    .sessionId(sessionID)
                    .startTime(startTime)
@@ -131,7 +134,7 @@ public class LoginService  extends BaseService{
                    .location(req.getHeader().getLocation())
                    .username(loginResponse.getUsername())
                    .build();
-           //TODO: Delete from auth_session where username=?
+
            int result = sessionIdDAO.insertSessionId(sessionRequest);
            if(result == 0){
                ApiError apiError = apiErrorUtils.getError("800");
@@ -140,6 +143,7 @@ public class LoginService  extends BaseService{
                return apiResponse;
            }
 
+           // Tạo phản hồi thành công
            LoginResponse response = new LoginResponse();
            response.setTransId(sessionID);
            response.setResponseCode("00");
@@ -152,6 +156,9 @@ public class LoginService  extends BaseService{
            ApiBody apiBody = new ApiBody();
            apiBody.put(ApiConstant.COMMAND.ENQUIRY, response);
            apiResponse.setBody(apiBody);
+
+
+           log.info("{} #LOGIN_SUCCESS: Customer ID: {}, Session ID: {}", LOCATION, customerId, sessionID);
        }catch (Exception e){
            log.error("{}:{}",LOCATION,e.getMessage());
             ApiError apiError = apiErrorUtils.getError(ApiConstant.ErrorCode.INTERNAL_SERVER_ERROR, new String[] {e.getMessage()});
