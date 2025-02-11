@@ -1,6 +1,7 @@
 package com.kaiasia.app.service.Auth_api.kafka.changepassword;
 
 import com.kaiasia.app.service.Auth_api.kafka.resetpwd.EmailMessage;
+import com.kaiasia.app.service.Auth_api.model.DataSendToKafka;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -25,10 +26,10 @@ public class KafkaUtilsChangePassword {
 
     @Value("${kafka_changePassword.email.notiKey}")
     private String notiKey;
-    public void sendMessage(String email, String resetCode) {
-        EmailMessage message = new EmailMessage();
-        String formattedContent = MessageFormat.format(content, resetCode);
-        message.setContent(formattedContent);
+    public void sendMessage1(String email) {
+        EmailMessageChangePassword message = new EmailMessageChangePassword();
+//        DataSendToKafka message = new DataSendToKafka(),
+        message.setContent(content);
         message.setSubject(subject);
         message.setEmail(email);
         message.setNotiKey(notiKey);

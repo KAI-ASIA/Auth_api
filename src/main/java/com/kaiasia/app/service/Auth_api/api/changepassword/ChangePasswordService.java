@@ -8,6 +8,7 @@ import com.kaiasia.app.register.KaiMethod;
 import com.kaiasia.app.register.KaiService;
 import com.kaiasia.app.register.Register;
 
+import com.kaiasia.app.service.Auth_api.api.takesession.TakeSessionService;
 import com.kaiasia.app.service.Auth_api.dao.SessionIdDAO;
 
 import com.kaiasia.app.service.Auth_api.kafka.changepassword.KafkaUtilsChangePassword;
@@ -98,7 +99,7 @@ public class ChangePasswordService extends BaseService {
         try {
             authSessionResponse = sessionIdDAO.getAuthSessionId(auth4Request.getSessionId());
         } catch (Exception e) {
-
+        log.error(location + "Session {0} not exist");
         }
             if (authSessionResponse == null) {
                 ApiError apiError = apiErrorUtils.getError("801", new String[]{auth4Request.getSessionId()});
@@ -139,9 +140,9 @@ public class ChangePasswordService extends BaseService {
             log.warn(location + "#FAILED TO EXPIRE SESSION: " + auth4Request.getSessionId() + " (Session might not exist)");
         }
         // 5. Gửi email xác nhận qua Kafka
-        String resetCode = resetPwdUtils.generateValidateCode();
+
         log.info(location + "#SEND TO KAFKA");
-        kafkaUtilsChangePassword.sendMessage(t24UserInfoResponse.getEmail(), resetCode);
+        kafkaUtilsChangePassword.sendMessage1(t24UserInfoResponse.getEmail());
 
         HashMap<String , Object> field = new HashMap<>();
         field.put("responseCode","00");
