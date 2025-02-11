@@ -140,9 +140,9 @@ public class ChangePasswordService extends BaseService {
             log.warn(location + "#FAILED TO EXPIRE SESSION: " + auth4Request.getSessionId() + " (Session might not exist)");
         }
         // 5. Gửi email xác nhận qua Kafka
-        String resetCode = resetPwdUtils.generateValidateCode();
+
         log.info(location + "#SEND TO KAFKA");
-        kafkaUtilsChangePassword.sendMessage(t24UserInfoResponse.getEmail(), resetCode);
+        kafkaUtilsChangePassword.sendMessage1(t24UserInfoResponse.getEmail());
 
         HashMap<String , Object> field = new HashMap<>();
         field.put("responseCode","00");
