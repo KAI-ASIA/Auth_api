@@ -8,7 +8,6 @@ import com.kaiasia.app.service.Auth_api.model.Auth6ResFromDb;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 
@@ -22,10 +21,18 @@ public class ResetPwdDao extends CommonDAO implements IResetPwdDao {
     @Override
     public int insertResetPwdRecord(Auth5InsertDb fields) {
 
-        String sql = "INSERT INTO "+this.getTableName()+" (trans_id, validate_code, username, channel, location, session_id, "
-                + "start_time, end_time, confirm_time, trans_info, trans_time) "
-                + "VALUES (:trans_id, :validate_code, :username, :channel, :location, :session_id, "
-                + ":start_time, :end_time, :confirm_time, :trans_info, :trans_time)";
+//        String sql = "INSERT INTO "+this.getTableName()+" (trans_id, validate_code, username, channel, location, session_id, "
+//                + "start_time, end_time, confirm_time, trans_info, trans_time) "
+//                + "VALUES (:trans_id, :validate_code, :username, :channel, :location, :session_id, "
+//                + ":start_time, :end_time, :confirm_time, :trans_info, :trans_time)";
+        StringBuilder sql = new StringBuilder();
+        sql.append("INSERT INTO ").append(this.getTableName()).append(" (")
+                .append("trans_id, validate_code, username, channel, location, session_id, ")
+                .append("start_time, end_time, confirm_time, trans_info, trans_time")
+                .append(") VALUES (")
+                .append(":trans_id, :validate_code, :username, :channel, :location, :session_id, ")
+                .append(":start_time, :end_time, :confirm_time, :trans_info, :trans_time")
+                .append(")");
 
         HashMap<String , Object> param = new HashMap<>();
         param.put("trans_id",fields.getTransId());
@@ -44,7 +51,7 @@ public class ResetPwdDao extends CommonDAO implements IResetPwdDao {
         int result ;
         try{
             log.info("insert to db with trans_id: {}-{}",fields.getTransId(),System.currentTimeMillis());
-            result = posgrestDAOHelper.update(sql,param);
+            result = posgrestDAOHelper.update(sql.toString(),param);
         }catch (Exception e) {
             log.info("Error inserting record with trans_id: {} ERROR :{}", fields.getTransId(),e.getMessage());
             throw new RuntimeException("Error inserting record", e);
@@ -55,8 +62,8 @@ public class ResetPwdDao extends CommonDAO implements IResetPwdDao {
 
     @Override
     public Auth6ResFromDb getResetPwdRecord(String username) {
-        StringBuilder sql = new StringBuilder("SELECT validate_code FROM ").append(this.getTableName()).append(" WHERE username = :username");
-
+        StringBuilder sql = new StringBuilder("SELECT validate_code FROM ").append(this.getTableName()).append(" WHERE username = :username ");
+        sql.append("ORDER BY start_time DESC LIMIT 1");
         HashMap<String , Object> param = new HashMap<>();
         param.put("username",username);
 

@@ -93,7 +93,7 @@ resetpwd:
   kafka:
     email:
       subject: "Thay đổi mật khẩu"
-      content: "Mã thay đổi mật khẩu của bạn là :{0}"
+      content: "Mã thay đổi mật khẩu của bạn là : {0} có thời hạn trong {1} phút"
     topic:
       name : "resetpwd"
   timeExpired: 5

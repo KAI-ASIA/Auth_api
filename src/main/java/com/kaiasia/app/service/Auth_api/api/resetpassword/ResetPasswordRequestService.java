@@ -134,7 +134,7 @@ public class ResetPasswordRequestService {
         ZoneId vietnamZone = ZoneId.of("Asia/Ho_Chi_Minh");
         ZonedDateTime vietnamTime = ZonedDateTime.now(vietnamZone);
         LocalDateTime now = vietnamTime.toLocalDateTime();
-        LocalDateTime expirationTime = now.plusSeconds(timeExpired);
+        LocalDateTime expirationTime = now.plusMinutes(timeExpired);
         String resetCode = resetPwdUtils.generateValidateCode();
 
         Auth5InsertDb auth5InsertDb = Auth5InsertDb.builder()

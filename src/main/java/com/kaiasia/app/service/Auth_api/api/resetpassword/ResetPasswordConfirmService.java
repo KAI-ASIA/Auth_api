@@ -151,6 +151,7 @@ public class ResetPasswordConfirmService {
                         .build(),
                 req.getHeader()
         );
+
         log.error(t24ChangePasswordResponse.getError().getCode());
         if (t24ChangePasswordResponse.getError() != null && !ApiError.OK_CODE.equals(t24ChangePasswordResponse.getError().getCode())){
             log.info(location + "#ERROR WHILE CHANGE PASSWORD" + (System.currentTimeMillis() - time));
