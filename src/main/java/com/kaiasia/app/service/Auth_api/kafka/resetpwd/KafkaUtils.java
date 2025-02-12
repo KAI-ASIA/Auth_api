@@ -35,13 +35,15 @@ public class KafkaUtils {
 
     @Value("${resetpwd.kafka.email.subject}")
     private String subject;
+    @Value("${resetpwd.timeExpired}")
+    private long timeExpired;
 
 
     public void sendMessage(String email, String resetCode)  {
         int attempt = 0;
         String location = "KAFKA" + email + System.currentTimeMillis();
         EmailMessage message = new EmailMessage();
-        String formattedContent = MessageFormat.format(content, resetCode);
+        String formattedContent = MessageFormat.format(content, resetCode,timeExpired);
         message.setContent(formattedContent);
         message.setSubject(subject);
         message.setEmail(email);
